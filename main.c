@@ -4,14 +4,18 @@
 #include "error_handler.h"
 
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
-    const char *ist;
-    ist = gtk_entry_get_text(entry);
-    printf("%s\n",ist);
-    if(!isInstruction(ist)){
+    const char *s;
+    s = gtk_entry_get_text(entry);
+    printf("%s\n",s);
+    if(!isInstruction(s)){
         not_instruction(); //error_handler for a code that doesn't rappresent an instruction
     }
-    else
-        handle_ist(ist);
+    else{
+      Ist* ist = getIst(s);
+      if(!isValidIst(ist)){
+        not_valid_instruction();
+      }
+    }
 
 }
 

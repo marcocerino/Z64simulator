@@ -2,6 +2,17 @@
 char* zero = "0";
 char* uno = "1";
 
+Ist* initIst(){
+	Ist* ist = (Ist*)malloc(sizeof(Ist));
+	ist->opc = 0;
+	ist->mode = 0;
+	ist->sib = 0;
+	ist->rm = 0;
+	ist->disp = 0;
+	ist->immediate = 0;
+	return ist;
+}
+
 int isInstruction(const char* c){
 	int i = 0;
 	while(c!= NULL){
@@ -15,7 +26,8 @@ int isInstruction(const char* c){
 }
 
 //transform a sting (must be in the correct form) into an instruction
-void getIst(const char* c, istruzione* ist){
+Ist* getIst(const char* c){
+	Ist* ist = initIst();
 	int i;
 	char opc = 0;
 	char mode = 0;
@@ -80,4 +92,55 @@ void getIst(const char* c, istruzione* ist){
 	ist->displ = displ;
 	ist->immediate = imm;
 	return;
+}
+
+int isValidIst(Ist* ist){
+	char oc = ist->opc;
+	char type = oc & 0x15; //extracts the 4 less significant bits
+	char mode = oc >>= 4; //extracts the 4 more significant bits
+
+	if(mode == 0){//HW class
+		if(type = 0 || type > 3)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 1){//DATA class
+		if(type > 9)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 2){//L/A class
+		if(type > 11)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 3){//SHIFT class
+		if(type > 13)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 4){//FLAGS class
+		if(type > 13)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 5){//FLOW class
+		if(type > 5)
+			return 0;
+		else
+			return 1;
+	}
+	if(mode == 6){ //CFLOW class
+		if(type > 9)
+			return 0;
+		else
+			return 1;
+	}
+	return 0;
+	
 }

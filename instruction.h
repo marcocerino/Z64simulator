@@ -7,11 +7,17 @@ typedef struct ist{
 	char rm;
 	short displ;
 	int immediate;
-}istruzione;
+}Ist;
+
+//initialize the istruction
+Ist* initIst();
 
 //gets the size of a string
 int isInstruction(const char* c);
 
 //transform a sting (must be in the correct form) into an instruction
-void getIst(const char* c, istruzione* ist);
+Ist* getIst(const char* c);
+
+//return 1 if the istruction is valid and exist in the Z64 instructions; 0 is it doesn't
+int isValidIst(Ist* ist);
 
