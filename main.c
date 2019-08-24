@@ -13,10 +13,7 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
     }
     else{
       Code* code = getCode(s);
-      if(!isValidCode(code)){
-        error_handler("L' istruzione inserita non esiste nell' instruction set dello Z64");
-      }
-      else
+      if(isValidCode(code))
         decodeCode(code);
     }
 

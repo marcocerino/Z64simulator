@@ -97,48 +97,47 @@ int isValidCode(Code* code){
 	char type = oc & 0x15; //extracts the 4 less significant bits
 	char mode = oc >>= 4; //extracts the 4 more significant bits
 
-	if(mode == 0){//HW class
-		if(type = 0 || type > 3)
-			return 0;
-		else
-			return 1;
+	char mem = code->mode & 0x3; //extrects the 2 less significant bits in the mode byte
+	if(mem == 3){
+		error_handler("L'istruzione genera un eccezione a runtime poichè entrambi gli operandi sono in memoria");
+		return 0;
 	}
-	if(mode == 1){//DATA class
-		if(type > 9)
-			return 0;
-		else
-			return 1;
+
+	if(mode == 0 && (type = 0 || type > 3)){//HW class
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	if(mode == 2){//L/A class
-		if(type > 11)
-			return 0;
-		else
-			return 1;
+	else if(mode == 1 && type > 9){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	if(mode == 3){//SHIFT class
-		if(type > 13)
-			return 0;
-		else
-			return 1;
+	else if(mode == 2 && type > 11){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	if(mode == 4){//FLAGS class
-		if(type > 13)
-			return 0;
-		else
-			return 1;
+	else if(mode == 3 && type > 13){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	if(mode == 5){//FLOW class
-		if(type > 5)
-			return 0;
-		else
-			return 1;
+	else if(mode == 4 && type > 13){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	if(mode == 6){ //CFLOW class
-		if(type > 9)
-			return 0;
-		else
-			return 1;
+	else if(mode == 5 && type > 5){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
 	}
-	return 0;
+	else if(mode == 6 && type > 9){
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
+	}
+
+	else{
+		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
+		return 0;
+	}
+
+	return 1;
+
 	
 }

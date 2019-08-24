@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-
+#include "error_handler.h"
 //data structore to contain the instruction
 typedef struct code{
 	char opcode;

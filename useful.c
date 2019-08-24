@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "useful.h"
 
 //int to char * (int from 0 to 99)
 char * itoa(int n){
