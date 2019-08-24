@@ -8,12 +8,12 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
     s = gtk_entry_get_text(entry);
     printf("%s\n",s);
     if(!isInstruction(s)){
-        not_instruction(); //error_handler for a code that doesn't rappresent an instruction
+        error_handler("La stringa inserita non è nel formato di una istruzione dell Z64"); //error_handler for a code that doesn't rappresent an instruction
     }
     else{
       Ist* ist = getIst(s);
       if(!isValidIst(ist)){
-        not_valid_instruction();
+        error_handler("L' istruzione inserita non esiste nell' instruction set dello Z64");
       }
     }
 

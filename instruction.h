@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <string.h>
+
 //data structore to contain the instruction
 typedef struct ist{
 	char opcode;

@@ -4,22 +4,20 @@ char* uno = "1";
 
 Ist* initIst(){
 	Ist* ist = (Ist*)malloc(sizeof(Ist));
-	ist->opc = 0;
+	ist->opcode = 0;
 	ist->mode = 0;
 	ist->sib = 0;
 	ist->rm = 0;
-	ist->disp = 0;
+	ist->displ = 0;
 	ist->immediate = 0;
 	return ist;
 }
 
 int isInstruction(const char* c){
-	int i = 0;
-	while(c!= NULL){
-		if(c[i] == zero[0] || c[i] == uno[0]){
-			i++;
-			c++;}
-		else 
+	if(strlen(c) != 128)
+		return 0;
+	for(int i=0; i<128; i++){
+		if(c[i] != zero[0] && c[i]!=uno[0])
 			return 0;
 	}
 	return 1;
@@ -91,11 +89,11 @@ Ist* getIst(const char* c){
 	ist->rm = rm;
 	ist->displ = displ;
 	ist->immediate = imm;
-	return;
+	return ist;
 }
 
 int isValidIst(Ist* ist){
-	char oc = ist->opc;
+	char oc = ist->opcode;
 	char type = oc & 0x15; //extracts the 4 less significant bits
 	char mode = oc >>= 4; //extracts the 4 more significant bits
 
