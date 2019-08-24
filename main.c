@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
-#include "instruction.h"
+#include "code.h"
 #include "error_handler.h"
 #include "decoder.h"
 
@@ -12,12 +12,12 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
         error_handler("La stringa inserita non è nel formato di una istruzione dell Z64"); //error_handler for a code that doesn't rappresent an instruction
     }
     else{
-      Ist* ist = getIst(s);
-      if(!isValidIst(ist)){
+      Code* code = getCode(s);
+      if(!isValidCode(code)){
         error_handler("L' istruzione inserita non esiste nell' instruction set dello Z64");
       }
       else
-        decodeIst(ist);
+        decodeCode(code);
     }
 
 }
