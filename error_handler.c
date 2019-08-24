@@ -1,7 +1,7 @@
 #include "error_handler.h"
 
 
-void error_handler(char* c);{
+void error_handler(char* c){
 	GtkWidget* window_error = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window_error),"Errore");
     GtkTextBuffer * buffer = gtk_text_buffer_new(NULL);

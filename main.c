@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "instruction.h"
 #include "error_handler.h"
+#include "decoder.h"
 
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
     const char *s;
@@ -15,6 +16,8 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
       if(!isValidIst(ist)){
         error_handler("L' istruzione inserita non esiste nell' instruction set dello Z64");
       }
+      else
+        decodeIst(ist);
     }
 
 }
@@ -36,7 +39,7 @@ int main (int argc, char **argv){
   //create the window
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "Z64 Simulator");
-  gtk_window_set_resizable(GTK_WINDOW(window),1);
+  gtk_window_set_resizable(GTK_WINDOW(window),0);
   g_signal_connect (window, "delete_event",G_CALLBACK (delete_event), NULL);
 
 
