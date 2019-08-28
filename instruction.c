@@ -12,7 +12,11 @@ Inst* initInst(){
 	i->name = NULL;
 	i->source = initOperando();
 	i->dest = initOperando();
-	i->displ = 0;
-	i->immediate = 0;
+	i->DI = -1;
+	i->BI = -1;
+	i->index =-1;
+	i->scale = -1
+	i->displ = -1;
+	i->immediate = -1;
 	return i;
 }
