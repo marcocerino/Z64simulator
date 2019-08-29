@@ -3,12 +3,12 @@
 #include "error_handler.h"
 //data structore to contain the instruction
 typedef struct code{
-	char opcode;
-	char mode;
-	char sib;
-	char rm;
-	short displ;
-	int immediate;
+	unsigned char opcode;
+	unsigned char mode;
+	unsigned char sib;
+	unsigned char rm;
+	unsigned int displ;
+	unsigned double immediate;
 }Code;
 
 //initialize the istruction

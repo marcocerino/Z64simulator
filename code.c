@@ -27,12 +27,12 @@ int isInstruction(const char* c){
 Code* getCode(const char* c){
 	Code* code = initCode();
 	int i;
-	char opc = 0;
-	char mode = 0;
-	char sib = 0;
-	char rm = 0;
-	short displ = 0;
-	int imm = 0;
+	unsigned char opc = 0;
+	unsigned char mode = 0;
+	unsigned char sib = 0;
+	unsigned char rm = 0;
+	unsigned int displ = 0;
+	unsigned double imm = 0;
 	int now;
 
 	//opcode is a bit long
@@ -93,11 +93,11 @@ Code* getCode(const char* c){
 }
 
 int isValidCode(Code* code){
-	char oc = code->opcode;
-	char type = oc & 0x15; //extracts the 4 less significant bits
-	char mode = oc >>= 4; //extracts the 4 more significant bits
+	unsigned char oc = code->opcode;
+	unsigned char type = oc & 0x15; //extracts the 4 less significant bits
+	unsigned char mode = oc >>= 4; //extracts the 4 more significant bits
 
-	char mem = code->mode & 0x3; //extrects the 2 less significant bits in the mode byte
+	unsigned char mem = code->mode & 0x3; //extrects the 2 less significant bits in the mode byte
 	if(mem == 3){
 		error_handler("L'istruzione genera un eccezione a runtime poichè entrambi gli operandi sono in memoria");
 		return 0;
