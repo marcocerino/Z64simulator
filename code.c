@@ -66,22 +66,37 @@ Code* getCode(const char* c){
 		rm += now *pow(2,7-i);
 	}
 
-	//displache is 4 bit long
-	for(i=0;i<32; i++){
+	int j, byte;
+	byte = 0;
+
+	//displacemant is 4 bit long
+	for(i=0; i<32;i++){
 		if(c[i+32]==zero[0])
 			now = 0;
 		else now = 1;
-		displ += now *pow(2,31-i);
+		byte += now * pow(2,7-(i%8));
+		if(i%8==0){
+			displ += byte * pow(2,(i-32)%8);
+			byte = 0;
+		}
 	}
 
-
-	//immediate is 8 bit long
-	for(i=0;i<64; i++){
+	for(i=0; i<64;i++){
 		if(c[i+64]==zero[0])
 			now = 0;
 		else now = 1;
-		imm += now * pow(2,63-i);
+		byte += now * pow(2,7-(i%8));
+		if(i%8==0){
+			displ += byte * pow(2,(i-64)%8);
+			byte = 0;
+		}
 	}
+
+
+
+	//immediate is 8 bit long
+	
+
 	code->opcode = opc;
 	code->mode = mode;
 	code->sib = sib;
