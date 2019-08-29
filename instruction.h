@@ -1,6 +1,26 @@
 #include <stdlib.h>
 #include "useful.h"
 #include "code.h"
+//reg names
+const char reg_names = {{{"AL"},{"AX"},{"EAX"},{"RAX"}},
+						{{"CL"},{"CX"},{"ECX"},{"RCX"}},
+						{{"DL"},{"DX"},{"EDX"},{"RDX"}},
+						{{"BL"},{"BX"},{"EBX"},{"RBX"}},
+						{{"SPL"},{"SP"},{"ESP"},{"RSP"}},
+						{{"BPL"},{"BP"},{"EBP"},{"RBP"}},
+						{{"SIL"},{"SI"},{"ESI"},{"RSI"}},
+						{{"DIL"},{"DI"},{"EDI"},{"RDI"}},
+						{{"R8B"},{"R8W"},{"E8D"},{"R8"}},
+						{{"R9B"},{"R9W"},{"E9D"},{"R9"}},
+						{{"R10B"},{"R10W"},{"E10D"},{"R10"}},
+						{{"R11B"},{"R11W"},{"E11D"},{"R11"}},
+						{{"R12B"},{"R12W"},{"E12D"},{"R12"}},
+						{{"R13B"},{"R13W"},{"E13D"},{"R13"}},
+						{{"R14B"},{"R14W"},{"E14D"},{"R14"}},
+						{{"R15B"},{"R15W"},{"E15D"},{"R15"}},
+						{{"FLAGS"},{"EFLAGS"},{"RFALGS"}},
+						{{"IP"},{"EIP"},{"RIP"}}};
+
 
 //data struct 
 typedef enum Reg{RAX=0,RCX=1,RDX=2,RBX=3,RSP=4,RBP=5,RSI=6,RDI=7,R8=8,R9=9,R10=10,R11=11,R12=12,R13=13,R14=14,R15=15} Reg;
@@ -37,3 +57,4 @@ Inst* codeToInst(Code* c);
 
 void printOperando(Operando* o);
 void printInst(Inst* i);
+
