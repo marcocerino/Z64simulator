@@ -42,7 +42,6 @@ Code* getCode(const char* c){
 		else now = 1;
 		opc += now * pow(2,7-i);
 	}
-	printf("%u\n",opc);
 	//mode camp is a bit long
 	for(i=0;i<8; i++){
 		if(c[i+8]==zero[0])

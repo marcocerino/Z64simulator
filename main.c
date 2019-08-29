@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
-#include "code.h"
 #include "error_handler.h"
+#include "instruction.h"
 
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
     const char *s;
@@ -14,6 +14,7 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
       Code* code = getCode(s);
       if(isValidCode(code)){
         printf("passed\n");
+        Inst * i = codeToInst(code);
       }
     }
 
