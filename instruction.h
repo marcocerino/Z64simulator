@@ -10,8 +10,8 @@ typedef enum Size {N=-1,B=0,W=1,L=2,Q=3} Size;
 typedef struct Operando{
 	Type t;
 	Size s;
-	Reg reg,
-	double immediate;
+	Reg reg;
+	unsigned long immediate;
 }Operando;
 
 
@@ -25,7 +25,7 @@ typedef struct inst{
 	Reg index;
 	unsigned char scale;
 	unsigned int displ;
-	unsigned double immediate;
+	unsigned long immediate;
 }Inst;
 
 Operando * initOperando(); 

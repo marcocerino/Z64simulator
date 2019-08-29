@@ -2,7 +2,6 @@
 #include <gtk/gtk.h>
 #include "code.h"
 #include "error_handler.h"
-#include "decoder.h"
 
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
     const char *s;
@@ -13,8 +12,9 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
     }
     else{
       Code* code = getCode(s);
-      if(isValidCode(code))
-        decodeCode(code);
+      if(isValidCode(code)){
+        printf("passed\n");
+      }
     }
 
 }
