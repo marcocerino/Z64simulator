@@ -28,11 +28,17 @@ Inst* initInst(){
 Inst* codeToInst(Code* c){
 	Inst* i = initInst();
 	i->opcode = c->opcode;
-	char SS,DS,DI,Mem;
+	char SS,DS,DI,Mem,Bp,Ip,Scale,Index;
 	Mem = c->mode & 0x3;
 	DI = (c->mode >>=2) & 0x3;
 	DS = (c->mode >>=4) & 0x3;
 	SS = (c->mode >>=6) & 0x3;
+	Bp = c->sib >>=7;
+	Ip = (c->sib >>=6) & 0x1;
+	Scale =(c->sib >>=4) & 0x3;
+	Index = c->sib & 0xF;
+
+	printf("Mem: %u\n\n",Mem);
 
 	//both operator are reg || source might be an immediate
 	if(Mem == 0){
@@ -44,7 +50,7 @@ Inst* codeToInst(Code* c){
 		
 
 		//source might be a reg or an immediate
-		if(DI == 0){ //source is a reg
+		if(DI  == 0){ //source is a reg
 			char source = c->rm >>=4;
 			i->source->t = REG;
 			i->source->s = SS;
@@ -62,11 +68,64 @@ Inst* codeToInst(Code* c){
 		}
 	}
 
-	// source in mem
-	else if(Mem == 1){}
+	// dest in mem
+	else if(Mem == 1){
+		i->dest->t = MEM;
+		i->dest->s = DS;
+		i->dest->hasDispl = DI >>=1;
+		i->dest->hasBase = Bp;
+		i->dest->hasIndex = Ip;
+		i->dest->scale = pow(2,Scale);
+		if(i->dest->hasDispl)
+			i->dest->displ = c->displ;
+		if(i->dest->hasBase)
+			i->dest->reg_base = c->rm & 0xF;
+		if(i->dest->hasIndex)
+			i->dest->reg_index = Index;
 
-	//dest in mem
-	else if(Mem == 2){}
+
+		//source might be a reg or an immediate
+		if(DI & 0x1 == 0){ //source is a reg
+			char source = c->rm >>=4;
+			i->source->t = REG;
+			i->source->s = SS;
+			i->source->reg_base = source;
+		}
+		else{
+			//source is an immediate
+			i->source->t = IMM;
+			i->source->s = DS;
+			if(DS < 2)
+				i->source->immediate = c->displ;
+			else
+				i->source->immediate = c->immediate;
+		}
+
+	}
+
+	//source in mem
+	else if(Mem == 2){
+		char dest = c->rm & 0xF;
+		//dest reg
+		i->dest->t = REG;
+		i->dest->s = DS;
+		i->dest->reg_base = dest;
+
+		//TODO: create source
+		i->source->t = MEM;
+		i->source->s = DS;
+		i->source->hasDispl = DI >>=1;
+		i->source->hasBase = Bp;
+		i->source->hasIndex = Ip;
+		i->source->scale = pow(2,Scale);
+		if(i->source->hasDispl)
+			i->source->displ = c->displ;
+		if(i->source->hasBase)
+			i->source->reg_base = c->rm & 0xF;
+		if(i->source->hasIndex)
+			i->source->reg_index = Index;
+
+	}
 	printInst(i);
 	return i;
 }
