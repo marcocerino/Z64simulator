@@ -109,46 +109,46 @@ int isValidCode(Code* code){
 	printCode(code);
 	unsigned char oc = code->opcode;
 	unsigned char type = oc & 0xF; //extracts the 4 less significant bits
-	unsigned char mode = oc >>= 4; //extracts the 4 more significant bits
+	unsigned char class = oc >>= 4; //extracts the 4 more significant bits
 	
 	
-	unsigned char mem = code->mode & 0x3; //extrects the 2 less significant bits in the mode byte
+	unsigned char mem = code->mode & 0x3; //extrects the 2 less significant bits in the class byte
 
 	if(mem == 3){
 		error_handler("L'istruzione genera un eccezione a runtime poichè entrambi gli operandi sono in memoria");
 		return 0;
 	}
 
-	if(mode == 0 && (type = 0 || type > 3)){//HW class
+	if(class == 0 && (type = 0 || type > 3)){//HW class
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 1 && type > 9){
+	else if(class == 1 && type > 9){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 2 && type > 11){
+	else if(class == 2 && type > 11){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 3 && type > 13){
+	else if(class == 3 && type > 7){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 4 && type > 13){
+	else if(class == 4 && type > 13){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 5 && type > 5){
+	else if(class == 5 && type > 4){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(mode == 6 && type > 9){
+	else if(class == 6 && type > 9){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
 
-	else if(mode>6){
+	else if(class>6){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}

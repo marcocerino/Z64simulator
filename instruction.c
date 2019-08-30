@@ -126,7 +126,6 @@ Inst* codeToInst(Code* c){
 			i->source->reg_index = Index;
 
 	}
-	printInst(i);
 	return i;
 }
 
@@ -153,3 +152,4 @@ void printInst(Inst* i){
 	printOperando(i->dest);
 
 }
+

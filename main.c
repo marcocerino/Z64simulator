@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "error_handler.h"
-#include "instruction.h"
+#include "microcode.h"
 
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
     const char *s;
@@ -13,11 +13,12 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
     else{
       Code* code = getCode(s);
       if(isValidCode(code)){
-        printf("passed\n");
         Inst * i = codeToInst(code);
+        printInst(i);
+        generateMicrocode(i);
+        return;
       }
     }
-
 }
 
 void delete_event(GtkWidget *widget, gpointer data){//callback function for x button

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "useful.h"
 #include "code.h"
 //reg names
@@ -20,7 +21,13 @@ const char reg_names = {{{"AL"},{"AX"},{"EAX"},{"RAX"}},
 						{{"R15B"},{"R15W"},{"E15D"},{"R15"}},
 						{{"FLAGS"},{"EFLAGS"},{"RFALGS"}},
 						{{"IP"},{"EIP"},{"RIP"}}};
-
+const char inst_names = {{{"hlt"},{"nop"},{"int"}},
+						{{"mov"},{"movs"},{"movz"},{"lea"},{"push"},{"pop"},{"pushf"},{"popf"},{"movs"},{"stos"}},
+						{{"add"},{"sub"},{"adc"},{"sbb"},{"cmp"},{"test"},{"neg"},{"and"},{"or"},{"not"},{"bt"}},
+						{{"sal"},{"shl"},{"sar"},{"shr"},{"rcl"},{"rcr"},{"rol"},{"ror"}},
+						{{"clc"},{"clp"},{"clz"},{"cls"},{"cli"},{"cld"},{"clo"},{"stc"},{"stp"},{"stz"},{"sts"},{"sti"},{"std"},{"sto"}},
+						{{"jmp"},{"call"},{"ret"},{"iret"}},
+						{{"jc"},{"jp"},{"jz"},{"js"},{"jo"},{"jnc"},{"jnp"},{"jnz"},{"jns"},{"jno"}}};
 
 //data struct 
 typedef enum Reg{RAX=0,RCX=1,RDX=2,RBX=3,RSP=4,RBP=5,RSI=6,RDI=7,R8=8,R9=9,R10=10,R11=11,R12=12,R13=13,R14=14,R15=15} Reg;
@@ -57,4 +64,3 @@ Inst* codeToInst(Code* c);
 
 void printOperando(Operando* o);
 void printInst(Inst* i);
-
