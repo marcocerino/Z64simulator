@@ -28,17 +28,24 @@ Inst* initInst(){
 Inst* codeToInst(Code* c){
 	Inst* i = initInst();
 	i->opcode = c->opcode;
-	char SS,DS,DI,Mem,Bp,Ip,Scale,Index;
+	unsigned char SS,DS,DI,Mem,Bp,Ip,Scale,Index;
 	Mem = c->mode & 0x3;
-	DI = (c->mode >>=2) & 0x3;
-	DS = (c->mode >>=4) & 0x3;
-	SS = (c->mode >>=6) & 0x3;
-	Bp = c->sib >>=7;
-	Ip = (c->sib >>=6) & 0x1;
-	Scale =(c->sib >>=4) & 0x3;
+	DI = (c->mode >>2) & 0x3;
+	DS = (c->mode >>4) & 0x3;
+	SS = (c->mode >>6) & 0x3;
+	Bp = c->sib >>7;
+	Ip = (c->sib >>6) & 0x1;
+	Scale =(c->sib >>4) & 0x3;
 	Index = c->sib & 0xF;
 
-	printf("Mem: %u\n\n",Mem);
+	printf("Mem: %u\n",Mem);
+	printf("DI; %u\n",DI);
+	printf("DS; %u\n",DS);
+	printf("SS; %u\n",SS);
+	printf("Bp; %u\n",Bp);
+	printf("Ip; %u\n",Ip);
+	printf("scale; %u\n",Scale);
+	printf("Index; %u\n",Index);
 
 	//both operator are reg || source might be an immediate
 	if(Mem == 0){
@@ -51,7 +58,7 @@ Inst* codeToInst(Code* c){
 
 		//source might be a reg or an immediate
 		if(DI  == 0){ //source is a reg
-			char source = c->rm >>=4;
+			char source = c->rm >>4;
 			i->source->t = REG;
 			i->source->s = SS;
 			i->source->reg_base = source;
@@ -72,7 +79,7 @@ Inst* codeToInst(Code* c){
 	else if(Mem == 1){
 		i->dest->t = MEM;
 		i->dest->s = DS;
-		i->dest->hasDispl = DI >>=1;
+		i->dest->hasDispl = DI >>1;
 		i->dest->hasBase = Bp;
 		i->dest->hasIndex = Ip;
 		i->dest->scale = pow(2,Scale);
@@ -86,7 +93,7 @@ Inst* codeToInst(Code* c){
 
 		//source might be a reg or an immediate
 		if(DI & 0x1 == 0){ //source is a reg
-			char source = c->rm >>=4;
+			char source = c->rm >>4;
 			i->source->t = REG;
 			i->source->s = SS;
 			i->source->reg_base = source;
@@ -114,14 +121,14 @@ Inst* codeToInst(Code* c){
 		//TODO: create source
 		i->source->t = MEM;
 		i->source->s = DS;
-		i->source->hasDispl = DI >>=1;
+		i->source->hasDispl = DI >>1;
 		i->source->hasBase = Bp;
 		i->source->hasIndex = Ip;
 		i->source->scale = pow(2,Scale);
 		if(i->source->hasDispl)
 			i->source->displ = c->displ;
 		if(i->source->hasBase)
-			i->source->reg_base = c->rm & 0xF;
+			i->source->reg_base = c->rm >>4;
 		if(i->source->hasIndex)
 			i->source->reg_index = Index;
 
@@ -133,12 +140,14 @@ Inst* codeToInst(Code* c){
 
 
 void printOperando(Operando* o){
+	printf("*********************************\n");
 	printf("type: %d\n",o->t);
 	printf("size: %d\n",o->s);
 	printf("reg_base: %d\n",o->reg_base);
 	printf("hasDispl: %d\n",o->hasDispl);
 	printf("hasIndex: %d\n",o->hasIndex);
 	printf("hasBase: %d\n",o->hasBase);
+	printf("reg_index: %d\n",o->reg_index);
 	printf("scale: %u\n",o->scale);
 	printf("displ: %u\n",o->displ );
 	printf("immediate: %lu\n", o->immediate);
