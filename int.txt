@@ -1,0 +1,3 @@
+MAR<-RIP
+MDR<-(MAR);RIP<-RIP+8
+IR<-MDR

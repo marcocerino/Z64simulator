@@ -16,7 +16,7 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
         Inst * i = codeToInst(code);
         printInst(i);
         generateMicrocode(i);
-        return;
+        printf("end\n");
       }
     }
 }

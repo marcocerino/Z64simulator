@@ -111,6 +111,9 @@ int isValidCode(Code* code){
 	unsigned char type = oc & 0xF; //extracts the 4 less significant bits
 	unsigned char class = oc >>= 4; //extracts the 4 more significant bits
 	
+	printf("isv: class: %u\n",class);
+
+	printf("isv: type: %u\n",type);
 	
 	unsigned char mem = code->mode & 0x3; //extrects the 2 less significant bits in the class byte
 
