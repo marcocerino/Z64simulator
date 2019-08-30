@@ -109,7 +109,7 @@ int isValidCode(Code* code){
 	printCode(code);
 	unsigned char oc = code->opcode;
 	unsigned char type = oc & 0xF; //extracts the 4 less significant bits
-	unsigned char class = oc >>= 4; //extracts the 4 more significant bits
+	unsigned char class = oc >> 4; //extracts the 4 more significant bits
 	
 	printf("isv: class: %u\n",class);
 
