@@ -66,8 +66,7 @@ Code* getCode(const char* c){
 		rm += now *pow(2,7-i);
 	}
 
-	int j, byte;
-	byte = 0;
+	int	byte = 0;
 
 	//displacemant is 4 bit long
 	for(i=0; i<32;i++){
