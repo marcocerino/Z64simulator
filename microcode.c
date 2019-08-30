@@ -150,20 +150,25 @@ void mov(Operando* d, Operando*s){
 void condJump(unsigned char opcode){
 	Boolean set;
 	int bit;
-	char ** bits ={{"CF"},{"PF"},{"ZF"},{"SF"},{"OF"}};
-	char type = opcode & 0xF;
+	char * bits [5] ;
+	bits[0]="CF";
+	bits[1]="PF";
+	bits[2]="ZF";
+	bits[3]="SF";
+	bits[4]="OF";
+	int type = opcode & 0xF;
 	if(opcode>4){
-		set = F;
-		bit = opcode -4;
+		set = T;
+		bit = opcode -5;
 	}
 	else {
-		set = T;
+		set = F;
 		bit = opcode;
 	}
 	FILE * f = fopen("j.txt","w");
 
 	//fetch phase
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
 
 	//condition
 	fprintf(f, "IF FLAG[%s] == %d THEN\n",bits[bit], set);
