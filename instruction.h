@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include "useful.h"
 #include "code.h"
 //reg names
 /*
@@ -35,6 +34,7 @@ typedef enum Reg{RAX=0,RCX=1,RDX=2,RBX=3,RSP=4,RBP=5,RSI=6,RDI=7,R8=8,R9=9,R10=1
 typedef enum Type {NONE=-1,REG=0, MEM=1,IMM =2} Type;
 typedef enum Size {N=-1,B=0,W=1,L=2,Q=3} Size;
 
+typedef enum Bool{F=0,T=1} Boolean;
 
 typedef struct Operando{
 	Type t;

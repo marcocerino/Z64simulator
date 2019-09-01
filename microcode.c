@@ -77,9 +77,10 @@ void hlt(){
 }
 void nope(){
 	printf("nope\n");
-	FILE * f = fopen("nope.txt","w");
+	FILE * f = fopen("nope/nope.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	fclose(f);
+	//ui("nope",3);
 }
 
 void inte(){

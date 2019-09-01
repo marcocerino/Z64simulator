@@ -1,4 +1,5 @@
 #include "instruction.h"
+
 #include <stdio.h>
 
 void generateMicrocode(Inst* i);//wrapper calls the function that handle the specific instruction
