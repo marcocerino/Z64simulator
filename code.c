@@ -142,7 +142,7 @@ int isValidCode(Code* code){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}
-	else if(class == 5 && type > 4){
+	else if(class == 5 && type > 5){
 		error_handler("L'istruzione non esiste nell'instruction set dello Z64");	
 		return 0;
 	}

@@ -37,25 +37,21 @@ void generateMicrocode(Inst* i){
 		if(type == 8)
 			stos();*/
 	}
+	else if(class == 5){
+		if(type == 0)
+			jump(F,NULL);
+		else if (type == 1){
+			jump(T,i->source);
+		}
+	}
 	else if(class == 6)
 		condJump(i->opcode);
 }
 
+
+
 //TODO: implement all the functions
 void getAddress(FILE*f, char* SoD,Boolean hasBase, Boolean hasIndex, Boolean hasDispl){
-	/*if(hasBase){
-				fprintf(f, "TEMP2<-%s_REG\nTEMP1<-Shifter_Out[SHL,SCALE]\n",SoD );
-				if(hasIndex){
-					fprintf(f,"TEMP2<-INDEX_REG\nMAR<-ALU_Out[ADD]\n");
-					if(hasDispl)
-						fprintf(f, "TEMP2<-IR[0:31]\nTEMP1<-MAR\nMAR<-ALU_Out[ADD]\n");
-				}
-				else if (hasDispl){
-					fprintf(f, "TEMP2<-IR[0:31]\nMAR<-ALU_Out[ADD]\n");
-				}
-				else
-					fprintf(f, "MAR<-TEMP1\n");
-			}*/
 	if(hasDispl && ! hasBase && ! hasIndex)
 		fprintf(f, "MAR<-TEMP1\n");
 	else if(!hasDispl && hasBase && !hasIndex)
@@ -144,6 +140,18 @@ void mov(Operando* d, Operando*s){
 			fprintf(f, "TEMP2<-SOURCE_REG\nDEST_REG<-TEMP2" );
 		}
 	}
+	fclose(f);
+}
+
+
+void jump(Boolean isAbsolute,Operando* o){
+	printf("jump\n");
+	FILE * f = fopen("jump.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR"); //fetch phase
+	if(isAbsolute == F)
+		fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
+	else
+		//TODO:fprintf(f, "", );
 	fclose(f);
 }
 

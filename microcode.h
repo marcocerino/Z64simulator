@@ -11,7 +11,7 @@ void nope();
 void inte();
 
 void mov(Operando* d,Operando*s);
-void movs(Operando* d,Operando*s);
+/*void movs(Operando* d,Operando*s);
 void movz (Operando* d,Operando*s);
 void lea(Operando* d,Operando*s);
 void push(Operando* s);
@@ -19,5 +19,7 @@ void pop(Operando* s);
 void popf();
 //void movs();
 void stos();
+*/
 
+void jump(Boolean isAbsolute,Operando* o);
 void condJump(unsigned char opcode);
