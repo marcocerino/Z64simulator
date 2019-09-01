@@ -40,10 +40,11 @@ void generateMicrocode(Inst* i){
 		else if (type == 1){
 			jump(T,i->source);
 		}
-		if(type == 3)
+		else if(type == 3)
 			call(F,NULL);
 		else if(type == 4)
 			call(T,i->source);
+		//TODO: ret & iret
 	}
 	else if(class == 6)
 		condJump(i->opcode);

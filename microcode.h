@@ -22,6 +22,9 @@ void pop(Boolean flag,Operando* s);
 void stos();
 */
 
+
+
 void jump(Boolean isAbsolute,Operando* o);
 void call(Boolean isAbsolute, Operando* o);
+
 void condJump(unsigned char opcode);
