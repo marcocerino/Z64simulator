@@ -1,6 +1,6 @@
 #include "microcode.h"
 
-void generateMicrocode(Inst* i){
+char* generateMicrocode(Inst* i){
 
 	unsigned char type = i->opcode & 0xF;
 	unsigned char class = i->opcode >> 4;
@@ -8,17 +8,17 @@ void generateMicrocode(Inst* i){
 
 	if(class == 0){
 		if(type == 0)
-			hlt();
+			return hlt();
 		else if(type == 1){
-			nope();
+			return nope();
 		}
 		else if(type == 2);
-			inte();
+			return inte();
 	}
 	
 	else if(class == 1){
 		if(type == 0)
-			mov(i->dest,i->source);
+			return mov(i->dest,i->source);
 		/*if(type == 1)
 			movs(i->dest,i->source);
 		if(type == 2)
@@ -26,28 +26,28 @@ void generateMicrocode(Inst* i){
 		if(type == 3)
 			lea(i->dest,i->source);
 		*/else if(type == 4)
-			push(F,i->source);
+			return push(F,i->source);
 		if(type == 5)
-			pop(F,i->source);
+			return pop(F,i->source);
 		else if(type == 6)
-			push(T,NULL);
+			return push(T,NULL);
 		if(type == 7)
-			pop(T,NULL);
+			return pop(T,NULL);
 	}
 	else if(class == 5){
 		if(type == 0)
-			jump(F,NULL);
+			return jump(F,NULL);
 		else if (type == 1){
-			jump(T,i->source);
+			return jump(T,i->source);
 		}
 		else if(type == 3)
-			call(F,NULL);
+			return call(F,NULL);
 		else if(type == 4)
-			call(T,i->source);
+			return call(T,i->source);
 		//TODO: ret & iret
 	}
 	else if(class == 6)
-		condJump(i->opcode);
+		return condJump(i->opcode);
 }
 
 
@@ -68,30 +68,32 @@ void getAddress(FILE*f, char* SoD,Boolean hasBase, Boolean hasIndex, Boolean has
 }
 
 
-void hlt(){
+char* hlt(){
 	printf("hlt\n");
 	FILE * f = fopen("hlt.txt","w");
 	fprintf(f,"la CPU si mette in modalità risparimo energetico");
 	fclose(f);
 	error_handler("la CPU si mette in modalità risparimo energetico");
+	return "hlt";
 }
-void nope(){
+char* nope(){
 	printf("nope\n");
 	FILE * f = fopen("nope/nope.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	fclose(f);
-	//ui("nope",3);
+	return "nope";
 }
 
-void inte(){
+char* inte(){
 	printf("int\n");
 	FILE * f = fopen("int.txt","w");
 	fprintf(f,"la CPU si mette in ascolto di un interrupt");
 	fclose(f);
 	error_handler("la CPU si mette in ascolto di un interrupt");
+	return "int";
 }
 
-void mov(Operando* d, Operando*s){
+char* mov(Operando* d, Operando*s){
 	printf("move\n");
 	FILE* f = fopen("move.txt","w");
 
@@ -144,9 +146,10 @@ void mov(Operando* d, Operando*s){
 		}
 	}
 	fclose(f);
+	return "mov";
 }
 
-void push(Boolean flag, Operando* o){
+char* push(Boolean flag, Operando* o){
 	printf("push\n");
 	FILE * f = fopen("push.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
@@ -157,9 +160,10 @@ void push(Boolean flag, Operando* o){
 	else
 		fprintf(f, "MDR<-SOURCE_REG\nMAR<-MDR;RSP<-RSP-8");
 	fclose(f);
+	return "push";
 }
 
-void pop(Boolean flag,Operando* o){
+char* pop(Boolean flag,Operando* o){
 	printf("pop\n");
 	FILE * f = fopen("pop.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
@@ -170,9 +174,10 @@ void pop(Boolean flag,Operando* o){
 	else
 		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nDEST_REG<-MDR\n");
 	fclose(f);
+	return "pop";
 }
 
-void jump(Boolean isAbsolute,Operando* o){
+char* jump(Boolean isAbsolute,Operando* o){
 	printf("jump\n");
 	FILE * f = fopen("jump.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
@@ -183,10 +188,11 @@ void jump(Boolean isAbsolute,Operando* o){
 	else;
 		//TODO:fprintf(f, "", );
 	fclose(f);
+	return "jump";
 }
 
 
-void call(Boolean isAbsolute, Operando* o){
+char* call(Boolean isAbsolute, Operando* o){
 	printf("call\n");
 	FILE * f = fopen("call.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
@@ -198,9 +204,10 @@ void call(Boolean isAbsolute, Operando* o){
 	if(isAbsolute == F)
 		fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
 	else;
+	return "call";
 }
 
-void condJump(unsigned char opcode){
+char* condJump(unsigned char opcode){
 	Boolean set;
 	int bit;
 	char * bits [5] ;
@@ -230,4 +237,5 @@ void condJump(unsigned char opcode){
 	fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
 
 	fclose(f);
+	return "j";
 }

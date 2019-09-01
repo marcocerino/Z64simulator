@@ -1,31 +1,30 @@
 #include "instruction.h"
-
 #include <stdio.h>
 
-void generateMicrocode(Inst* i);//wrapper calls the function that handle the specific instruction
+char* generateMicrocode(Inst* i);//wrapper calls the function that handle the specific instruction
 
 //function to generate the microcode to get the address of an operator
 void getAddress(FILE* f,char* SoD,Boolean hasBase, Boolean hasIndex, Boolean hasDispl);//SoD must be either SOURCE or DEST
 
-void hlt();
-void nope();
-void inte();
+char* hlt();
+char* nope();
+char* inte();
 
-void mov(Operando* d,Operando*s);
-/*void movs(Operando* d,Operando*s);
-void movz (Operando* d,Operando*s);
-void lea(Operando* d,Operando*s);
+char* mov(Operando* d,Operando*s);
+/*char* movs(Operando* d,Operando*s);
+char* movz (Operando* d,Operando*s);
+char* lea(Operando* d,Operando*s);
 */
-void push(Boolean flag,Operando* s);
-void pop(Boolean flag,Operando* s);
+char* push(Boolean flag,Operando* s);
+char* pop(Boolean flag,Operando* s);
 
-/*void movs();
-void stos();
+/*char* movs();
+char* stos();
 */
 
 
 
-void jump(Boolean isAbsolute,Operando* o);
-void call(Boolean isAbsolute, Operando* o);
+char* jump(Boolean isAbsolute,Operando* o);
+char* call(Boolean isAbsolute, Operando* o);
 
-void condJump(unsigned char opcode);
+char* condJump(unsigned char opcode);
