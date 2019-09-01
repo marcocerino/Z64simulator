@@ -10,7 +10,6 @@ void generateMicrocode(Inst* i){
 		if(type == 0)
 			hlt();
 		else if(type == 1){
-			printf("hello\n");
 			nope();
 		}
 		else if(type == 2);
@@ -26,16 +25,14 @@ void generateMicrocode(Inst* i){
 			movz(i->dest,i->source);
 		if(type == 3)
 			lea(i->dest,i->source);
-		if(type == 4)
-			push(i->source);
+		*/else if(type == 4)
+			push(F,i->source);
 		if(type == 5)
-			pop(i->source);
-		if(type == 6)
-			popf();
+			pop(F,i->source);
+		else if(type == 6)
+			push(T,NULL);
 		if(type == 7)
-			//movs();
-		if(type == 8)
-			stos();*/
+			pop(T,NULL);
 	}
 	else if(class == 5){
 		if(type == 0)
@@ -43,6 +40,10 @@ void generateMicrocode(Inst* i){
 		else if (type == 1){
 			jump(T,i->source);
 		}
+		if(type == 3)
+			call(F,NULL);
+		else if(type == 4)
+			call(T,i->source);
 	}
 	else if(class == 6)
 		condJump(i->opcode);
@@ -76,7 +77,7 @@ void hlt(){
 void nope(){
 	printf("nope\n");
 	FILE * f = fopen("nope.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	fclose(f);
 }
 
@@ -143,16 +144,58 @@ void mov(Operando* d, Operando*s){
 	fclose(f);
 }
 
+void push(Boolean flag, Operando* o){
+	printf("push\n");
+	FILE * f = fopen("push.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//MAR<-RSP
+	fprintf(f, "MAR<-RSP\n");
+	if(flag == T)
+		fprintf(f, "MDR<-FLAGS\nMAR<-MDR;RSP<-RSP-8");
+	else
+		fprintf(f, "MDR<-SOURCE_REG\nMAR<-MDR;RSP<-RSP-8");
+	fclose(f);
+}
+
+void pop(Boolean flag,Operando* o){
+	printf("pop\n");
+	FILE * f = fopen("pop.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//MAR<-RSP
+	fprintf(f, "MAR<-RSP\n");
+	if(flag == T)
+		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nFLAGS<-MDR\n");
+	else
+		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nDEST_REG<-MDR\n");
+	fclose(f);
+}
 
 void jump(Boolean isAbsolute,Operando* o){
 	printf("jump\n");
 	FILE * f = fopen("jump.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+
+	//relative jump
 	if(isAbsolute == F)
 		fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
-	else
+	else;
 		//TODO:fprintf(f, "", );
 	fclose(f);
+}
+
+
+void call(Boolean isAbsolute, Operando* o){
+	printf("call\n");
+	FILE * f = fopen("call.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	//the call function has to copy the rip register in the stack
+	fprintf(f,"MAR<-RSP\nMDR<-RIP;RSP<-RSP-8\nMAR<-MDR\n");
+
+	//relative
+	if(isAbsolute == F)
+		fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
+	else;
 }
 
 void condJump(unsigned char opcode){

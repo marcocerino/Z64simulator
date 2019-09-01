@@ -6,7 +6,7 @@
 void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
     const char *s;
     s = gtk_entry_get_text(entry);
-    printf("%s\n",s);
+    printf("%s\n\n",s);
     if(!isInstruction(s)){
         error_handler("La stringa inserita non è nel formato di una istruzione dell Z64"); //error_handler for a code that doesn't rappresent an instruction
     }

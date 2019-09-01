@@ -162,6 +162,8 @@ int isValidCode(Code* code){
 
 
 void printCode(Code* code){
+	
+	printf("*****************************\n");
 	printf("opcode: %u\n",code->opcode);
 	printf("mode: %u\n",code->mode);
 	printf("sib: %u\n",code->sib);
