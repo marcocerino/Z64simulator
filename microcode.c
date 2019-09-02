@@ -19,13 +19,9 @@ char* generateMicrocode(Inst* i){
 	else if(class == 1){
 		if(type == 0)
 			return mov(i->dest,i->source);
-		/*if(type == 1)
-			movs(i->dest,i->source);
-		if(type == 2)
-			movz(i->dest,i->source);
-		if(type == 3)
-			lea(i->dest,i->source);
-		*/else if(type == 4)
+		//TODO: come fare esenzione del segno
+		//TODO: lea
+		else if(type == 4)
 			return push(F,i->source);
 		if(type == 5)
 			return pop(F,i->source);
@@ -34,20 +30,33 @@ char* generateMicrocode(Inst* i){
 		if(type == 7)
 			return pop(T,NULL);
 	}
+	else if (class == 2){
+		return alu(i);
+	}
+	else if(class == 3){
+		return shift(i);
+	}
+	else if (class == 4){
+		if(type <=6)
+			return setFlags(type,T);
+		else
+			return setFlags(type-7,F);
+	}
 	else if(class == 5){
 		if(type == 0)
 			return jump(F,NULL);
 		else if (type == 1){
 			return jump(T,i->source);
 		}
-		else if(type == 3)
+		else if(type == 2)
 			return call(F,NULL);
-		else if(type == 4)
+		else if(type == 3)
 			return call(T,i->source);
 		//TODO: ret & iret
 	}
 	else if(class == 6)
 		return condJump(i->opcode);
+	return "ops";
 }
 
 
@@ -69,32 +78,29 @@ void getAddress(FILE*f, char* SoD,Boolean hasBase, Boolean hasIndex, Boolean has
 
 
 char* hlt(){
-	printf("hlt\n");
 	FILE * f = fopen("hlt.txt","w");
 	fprintf(f,"la CPU si mette in modalità risparimo energetico");
 	fclose(f);
 	error_handler("la CPU si mette in modalità risparimo energetico");
-	return "hlt";
+	return "hlt.txt";
 }
 char* nope(){
 	printf("nope\n");
-	FILE * f = fopen("nope/nope.txt","w");
+	FILE * f = fopen("nope.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	fclose(f);
-	return "nope";
+	return "nope.txt";
 }
 
 char* inte(){
-	printf("int\n");
 	FILE * f = fopen("int.txt","w");
 	fprintf(f,"la CPU si mette in ascolto di un interrupt");
 	fclose(f);
 	error_handler("la CPU si mette in ascolto di un interrupt");
-	return "int";
+	return "int.txt";
 }
 
 char* mov(Operando* d, Operando*s){
-	printf("move\n");
 	FILE* f = fopen("move.txt","w");
 
 	 //fetch phase
@@ -146,11 +152,11 @@ char* mov(Operando* d, Operando*s){
 		}
 	}
 	fclose(f);
-	return "mov";
+	return "move.txt";
 }
 
 char* push(Boolean flag, Operando* o){
-	printf("push\n");
+
 	FILE * f = fopen("push.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	//MAR<-RSP
@@ -160,11 +166,10 @@ char* push(Boolean flag, Operando* o){
 	else
 		fprintf(f, "MDR<-SOURCE_REG\nMAR<-MDR;RSP<-RSP-8");
 	fclose(f);
-	return "push";
+	return "push.txt";
 }
 
 char* pop(Boolean flag,Operando* o){
-	printf("pop\n");
 	FILE * f = fopen("pop.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	//MAR<-RSP
@@ -174,11 +179,98 @@ char* pop(Boolean flag,Operando* o){
 	else
 		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nDEST_REG<-MDR\n");
 	fclose(f);
-	return "pop";
+	return "pop.txt";
 }
 
+char * alu(Inst* i){
+	unsigned char type = i->opcode & 0xF;
+	FILE * f = fopen("alu.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//dest is a reg
+	if(i->dest->t == REG)
+		fprintf(f, "TEMP2<-DEST_REG\n");
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",i->source->hasBase,i->source->hasIndex,i->source->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP2<-MDR");		
+	}
+	
+	//source is an immediate
+	if(i->source->t == IMM){
+		//source is short
+		if(i->source->s <2)
+			fprintf(f, "TEMP1<-IR[0:31]");
+		//source is longer than 2 bytes
+		else
+			fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nTEMP1<-MDR");
+	}
+	//source is a reg
+	else if(i->source->t == REG)
+		fprintf(f, "TEMP1<-SOURCE_REG\n");
+
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",i->source->hasBase,i->source->hasIndex,i->source->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR");
+	}
+
+	//TODO: complete
+
+
+	fclose(f);
+	return "alu.txt";
+}
+
+
+char* shift(Inst* i){
+	FILE * f = fopen("shift.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+
+	//the dest value must be put in TEMP2
+	if(i->dest->t == REG)
+		fprintf(f,"TEMP2<-DEST_REG\n");
+	else{
+		getAddress(f,"DEST",i->dest->hasBase,i->dest->hasIndex,i->dest->hasDispl);
+		fprintf(f,"MDR<-(MAR)\nTEMP2<-MDR\n");
+	}
+
+	
+	//the instructions can have an immediate, overwise the number of time the source must be shifted is in RCX
+	if(i->source->t == IMM){
+		if(i->dest->t == REG)
+			fprintf(f, "DEST_REG<-Shifter_Out[%d,immediate]",(i->opcode&0xF));
+		else
+			fprintf(f, "(MAR)<-Shifter_Out[%d,immediate]",(i->opcode&0xF) );
+	}
+	else{
+		if(i->dest->t == REG)
+			fprintf(f, "DEST_REG<-Shifter_Out[%d,RCX]",(i->opcode&0xF));
+		else
+			fprintf(f, "(MAR)<-Shifter_Out[%d,RCX]",(i->opcode&0xF) );
+	
+	}
+	fclose(f);
+	return "shift.txt";
+}
+
+char* setFlags(int bit,Boolean setZero){
+	char * bits [5] ;
+	bits[0]="CF";
+	bits[1]="PF";
+	bits[2]="ZF";
+	bits[3]="SF";
+	bits[4]="OF";
+	FILE * f = fopen("flags.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//TODO: how to write the correct bit on Flags reg
+	if(setZero);
+	else;
+	fclose(f);
+	return "flags.txt";
+}
+
+
 char* jump(Boolean isAbsolute,Operando* o){
-	printf("jump\n");
 	FILE * f = fopen("jump.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 
@@ -188,12 +280,11 @@ char* jump(Boolean isAbsolute,Operando* o){
 	else;
 		//TODO:fprintf(f, "", );
 	fclose(f);
-	return "jump";
+	return "jump.txt";
 }
 
 
 char* call(Boolean isAbsolute, Operando* o){
-	printf("call\n");
 	FILE * f = fopen("call.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -204,7 +295,8 @@ char* call(Boolean isAbsolute, Operando* o){
 	if(isAbsolute == F)
 		fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
 	else;
-	return "call";
+	fclose(f);
+	return "call.txt";
 }
 
 char* condJump(unsigned char opcode){
@@ -237,5 +329,5 @@ char* condJump(unsigned char opcode){
 	fprintf(f, "TEMP1<-RIP\nTEMP2<-IR[0:31]\nRIP<-ALU_Out[ADD]");
 
 	fclose(f);
-	return "j";
+	return "j.txt";
 }
