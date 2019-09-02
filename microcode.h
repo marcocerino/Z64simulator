@@ -35,7 +35,6 @@ char* setFlags(int bit, Boolean setZero);
 char* jump(Boolean isAbsolute,Operando* o);
 //call inst
 char* call(Boolean isAbsolute, Operando* o);
-
-//TODO: ret and iret
+char* ret();
 //conditioned jump inst
 char* condJump(unsigned char opcode);

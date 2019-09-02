@@ -31,7 +31,7 @@ char* generateMicrocode(Inst* i){
 			return pop(T,NULL);
 	}
 	else if (class == 2){
-		return alu(i);
+		//TODO: alu instr
 	}
 	else if(class == 3){
 		return shift(i);
@@ -52,7 +52,8 @@ char* generateMicrocode(Inst* i){
 			return call(F,NULL);
 		else if(type == 3)
 			return call(T,i->source);
-		//TODO: ret & iret
+		else if(type == 4 || type == 5)
+			return ret();
 	}
 	else if(class == 6)
 		return condJump(i->opcode);
@@ -182,45 +183,6 @@ char* pop(Boolean flag,Operando* o){
 	return "pop.txt";
 }
 
-char * alu(Inst* i){
-	unsigned char type = i->opcode & 0xF;
-	FILE * f = fopen("alu.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
-	//dest is a reg
-	if(i->dest->t == REG)
-		fprintf(f, "TEMP2<-DEST_REG\n");
-	//dest is in memory
-	else{
-		getAddress(f,"DEST",i->source->hasBase,i->source->hasIndex,i->source->hasDispl);
-		fprintf(f, "MDR<-(MAR)\nTEMP2<-MDR");		
-	}
-	
-	//source is an immediate
-	if(i->source->t == IMM){
-		//source is short
-		if(i->source->s <2)
-			fprintf(f, "TEMP1<-IR[0:31]");
-		//source is longer than 2 bytes
-		else
-			fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nTEMP1<-MDR");
-	}
-	//source is a reg
-	else if(i->source->t == REG)
-		fprintf(f, "TEMP1<-SOURCE_REG\n");
-
-	//source is in memory
-	else{
-		getAddress(f,"SOURCE",i->source->hasBase,i->source->hasIndex,i->source->hasDispl);
-		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR");
-	}
-
-	//TODO: complete
-
-
-	fclose(f);
-	return "alu.txt";
-}
-
 
 char* shift(Inst* i){
 	FILE * f = fopen("shift.txt","w");
@@ -272,7 +234,8 @@ char* setFlags(int bit,Boolean setZero){
 
 char* jump(Boolean isAbsolute,Operando* o){
 	FILE * f = fopen("jump.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
 
 	//relative jump
 	if(isAbsolute == F)
@@ -286,8 +249,9 @@ char* jump(Boolean isAbsolute,Operando* o){
 
 char* call(Boolean isAbsolute, Operando* o){
 	FILE * f = fopen("call.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
-	
+	//fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
+
 	//the call function has to copy the rip register in the stack
 	fprintf(f,"MAR<-RSP\nMDR<-RIP;RSP<-RSP-8\nMAR<-MDR\n");
 
@@ -298,7 +262,17 @@ char* call(Boolean isAbsolute, Operando* o){
 	fclose(f);
 	return "call.txt";
 }
+char * ret(){
+	FILE * f = fopen("ret.txt","w");
+	//fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
 
+	//have to put the return address from the stack into RIP
+	fprintf(f, "MAR<-RSP\nMDR<-(MAR);RSP<-RSP+8\nRIP<-MDR" );
+	fclose(f);
+	return "ret.txt";
+
+}
 char* condJump(unsigned char opcode){
 	Boolean set;
 	int bit;
