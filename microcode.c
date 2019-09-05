@@ -29,9 +29,32 @@ char* generateMicrocode(Inst* i){
 			return push(T,NULL);
 		if(type == 7)
 			return pop(T,NULL);
+		//TODO: movs and stos
 	}
 	else if (class == 2){
-		//TODO: alu instr
+		if(type == 0)
+			return add(i->dest,i->source);
+		else if(type == 1)
+			return sub(i->dest,i->source);
+		else if(type == 2)
+			return adc(i->dest,i->source);
+		else if(type == 3)
+			return sbb(i->dest,i->source);
+		else if(type == 4)
+			return cmp(i->dest,i->source);
+		else if(type == 5)
+			return test(i->dest,i->source);
+		//TODO:  neg
+		else if(type == 7)
+			return and(i->dest,i->source);
+		else if(type == 8)
+			return or(i->dest,i->source);
+		else if(type == 9)
+			return xor(i->dest,i->source);
+		else if(type == 10)
+			return not(i->dest);
+		else if(type == 11)
+			return bt(i->dest,i->source);
 	}
 	else if(class == 3){
 		return shift(i);
@@ -135,21 +158,20 @@ char* mov(Operando* d, Operando*s){
 	else if(d->t == MEM){
 		
 		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
-		fprintf(f, "MDR<-DEST_REG\n(MAR)<-MDR");
 			
 		//source is an immediate
 		if(s->t == IMM){ 
 			//source is at max 2 bytes long
 			if(s->s <2)
-				fprintf(f, "DEST_REG<-IR[0:31]");
+				fprintf(f, "(MAR)<-IR[0:31]");
 			//source is longer than 2 bytes
 			else
-				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nDEST_REG<-MDR");
+				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\n(MAR)<-MDR");
 		}
 
 		//source is a register
 		else if(s->t == REG){
-			fprintf(f, "TEMP2<-SOURCE_REG\nDEST_REG<-TEMP2" );
+			fprintf(f, "(MAR)<-SOURCE_REG" );
 		}
 	}
 	fclose(f);
@@ -183,6 +205,340 @@ char* pop(Boolean flag,Operando* o){
 	return "pop.txt";
 }
 
+
+char * add(Operando* d, Operando* s){
+	FILE * f = fopen("add.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[ADD]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[ADD]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "add.txt";
+
+}
+
+char * sub(Operando* d, Operando* s){
+	FILE * f = fopen("sub.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[SUB]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[SUB]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "sub.txt";
+
+}
+
+
+char * adc(Operando* d, Operando* s){
+	FILE * f = fopen("adc.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	//extract CF into TEMP1
+	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n")
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+
+	//we add source and CF
+	fprintf(f, "TEMP2<-ALU_Out[ADD]\n" );
+	
+
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[ADD]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[ADD]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "adc.txt";
+
+}
+char * adc(Operando* d, Operando* s){
+	FILE * f = fopen("sbb.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	//extract CF into TEMP1
+	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n")
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+
+	//we add source and CF
+	fprintf(f, "TEMP2<-ALU_Out[ADD]\n" );
+	
+
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[SUB]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[SUB]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "sbb.txt";
+
+}
+char * cmp(Operando * d, Operando* s){
+	FILE * f = fopen("cmp.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "ALU_Out[SUB]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"ALU_Out[SUB]\n");
+	}
+	fclose(f);
+	return "cmp.txt";
+}
+char * test(Operando* d,Operando* s){
+	FILE * f = fopen("test.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "ALU_Out[AND]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"ALU_Out[AND]\n");
+	}
+	fclose(f);
+	return "test.txt";
+}
+char* neg(Operando* d){
+	if(d->t == IMM){
+		error_handler("L'istruzione neg non ammette immediati");
+		return NULL;
+	}
+	FILE * f = fopen("neg.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//TODO: xor with all 1 bits
+	//TODO: add the result with 1
+	fclose(f);
+	return "neg.txt";
+}
+
+char * and(Operando* d,Operando* s){
+	FILE * f = fopen("and.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[AND]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[AND]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "and.txt";
+}
+
+char* or(Operando* d,Operando* s){
+	FILE * f = fopen("or.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[OR]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[OR]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "or.txt";
+}
+
+char* xor(Operando* d,Operando* s){
+	FILE * f = fopen("xor.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	
+	//source is an immediate
+	if(s->t == IMM)
+		fprintf(f,"TEMP2<-IR[0:31]\n");
+	//source is a reg
+	else if (s->t == REG)
+		fprintf(f, "TEMP2<-SOURCE_REG\n");
+	//source is in memory
+	else{
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "TEMP2<-MDR\n");
+	}
+	//dest is a reg
+	if(d->t == REG){
+		fprintf(f, "TEMP1<-DEST_REG\n" );
+		fprintf(f, "DEST_REG<-ALU_Out[XOR]\n" );
+	}
+	//dest is in memory
+	else{
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl);
+		fprintf(f, "MDR<-(MAR)\nTEMP1<-MDR\n");
+		fprintf(f,"MDR<-ALU_Out[XOR]\n(MAR)<-MDR\n");
+	}
+	fclose(f);
+	return "xor.txt";
+}
+
+char * not(Operando* d){
+	if(d->t == IMM){
+		error_handler("L'istruzione not non ammette immediati");
+		return NULL;
+	}
+	FILE * f = fopen("not.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	//TODO: xor with all 1 bits
+	fclose(f);
+	return "not.txt";
+}
+
+char * bt(Operando* d, Operando* s){
+	if(s->t != IMM){
+		error_handler("L'istruzione bt supporta solo un immediato come tipo di dato nella source");
+		return NULL;
+	}
+	FILE * f = fopen("bt.txt","w");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	
+	//TODO: how to write the correct bit on Flags reg
+	fclose(f);
+	return "bt.txt"
+}
 
 char* shift(Inst* i){
 	FILE * f = fopen("shift.txt","w");

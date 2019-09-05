@@ -16,14 +16,23 @@ char* inte();
 char* mov(Operando* d,Operando*s);
 //TODO: mov with sign extension
 //TODO: lea
-
-//push and pop instructions
 char* push(Boolean flag,Operando* s);
 char* pop(Boolean flag,Operando* s);
-
 //TODO:movs and stos
 
-//TODO: ALU instr
+//ALU instr
+char * add(Operando* d, Operando* s);
+char * sub(Operando* d, Operando* s);
+char * adc(Operando* d, Operando* s);
+char * sbb(Operando* d, Operando* s);
+char * cmp(Operando * d, Operando* s);
+char * test(Operando * d,Operando* s);
+char * neg(Operando* d);
+char * and(Operando* d,Operando* s);
+char* or(Operando* d,Operando* s);
+char* xor(Operando* d,Operando* s);
+char * not(Operando* d);
+char * bt(Operando* d, Operando* s);
 
 //shift inst
 char* shift(Inst* i);
@@ -33,8 +42,8 @@ char* setFlags(int bit, Boolean setZero);
 
 //uncondition jump inst
 char* jump(Boolean isAbsolute,Operando* o);
-//call inst
 char* call(Boolean isAbsolute, Operando* o);
 char* ret();
+
 //conditioned jump inst
 char* condJump(unsigned char opcode);
