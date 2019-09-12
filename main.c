@@ -10,15 +10,16 @@ void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the g
     const char *s;
     s = gtk_entry_get_text(entry);
     printf("%s\n\n",s);
-    if(!isInstruction(s)){
+    if(!is_instruction(s)){
         error_handler("La stringa inserita non è nel formato di una istruzione dell Z64"); //error_handler for a code that doesn't rappresent an instruction
     }
     else{
-      Code* code = getCode(s);
-      if(isValidCode(code)){
-        Inst * i = codeToInst(code);
-        printInst(i);
-        char* p = generateMicrocode(i);
+      code_t code;
+      get_code(s,&code);
+      if(is_valid_code(&code)){
+        inst_t * i = code_to_inst(&code);
+        print_inst(i);
+        char* p = generate_microcode(i);
         printf("%s\n",p);
       }
     }

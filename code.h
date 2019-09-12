@@ -11,19 +11,19 @@ typedef struct code{
 	unsigned char rm;
 	unsigned int displ;
 	unsigned long immediate;
-}Code;
+}code_t;
 
 //initialize the istruction
-Code* initCode();
+void init_code(code_t* code);
 
 //gets the size of a string
-int isInstruction(const char* c);
+int is_instruction(const char* c);
 
 //transform a sting (must be in the correct form) into an instruction
-Code* getCode(const char* c);
+size_t get_code(const char* c,code_t* code);
 
 //return 1 if the istruction is valid and exist in the Z64 instructions; 0 is it doesn't
-int isValidCode(Code* code);
+int is_valid_code(code_t* code);
 
-void printCode(Code* code);
+void print_code(code_t* code);
 

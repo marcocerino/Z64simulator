@@ -1,8 +1,8 @@
 #include "instruction.h"
 
 
-Operando * initOperando(){
-	Operando* o = (Operando*)malloc(sizeof(Operando));
+operando_t * init_operando(){
+	operando_t* o = (operando_t*)malloc(sizeof(operando_t));
 	o->t = NONE;
 	o->s = N;
 	o->reg_base = -1;
@@ -16,17 +16,17 @@ Operando * initOperando(){
 
 }
 
-Inst* initInst(){
-	Inst* i = (Inst*)malloc(sizeof(Inst));
+inst_t* init_inst(){
+	inst_t* i = (inst_t*)malloc(sizeof(inst_t));
 	i->opcode = -1;
-	i->source = initOperando();
-	i->dest = initOperando();
+	i->source = init_operando();
+	i->dest = init_operando();
 	return i;
 }
 
 
-Inst* codeToInst(Code* c){
-	Inst* i = initInst();
+inst_t* code_to_inst(code_t* c){
+	inst_t* i = init_inst();
 	i->opcode = c->opcode;
 	unsigned char SS,DS,DI,Mem,Bp,Ip,Scale,Index;
 	Mem = c->mode & 0x3;
@@ -118,7 +118,6 @@ Inst* codeToInst(Code* c){
 		i->dest->s = DS;
 		i->dest->reg_base = dest;
 
-		//TODO: create source
 		i->source->t = MEM;
 		i->source->s = DS;
 		i->source->hasDispl = DI >>1;
@@ -139,7 +138,7 @@ Inst* codeToInst(Code* c){
 
 
 
-void printOperando(Operando* o){
+void print_operando(operando_t* o){
 	printf("*********************************\n");
 	printf("type: %d\n",o->t);
 	printf("size: %d\n",o->s);
@@ -153,12 +152,12 @@ void printOperando(Operando* o){
 	printf("immediate: %lu\n", o->immediate);
 }
 
-void printInst(Inst* i){
+void print_inst(inst_t* i){
 	printf("opcode: %u\n",i->opcode);
 	printf("source:\n");
-	printOperando(i->source);
+	print_operando(i->source);
 	printf("dest:\n");
-	printOperando(i->dest);
+	print_operando(i->dest);
 
 }
 

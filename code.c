@@ -2,18 +2,16 @@
 char* zero = "0";
 char* uno = "1";
 
-Code* initCode(){
-	Code* code = (Code*)malloc(sizeof(Code));
+void init_code(code_t* code){
 	code->opcode = 0;
 	code->mode = 0;
 	code->sib = 0;
 	code->rm = 0;
 	code->displ = 0;
 	code->immediate = 0;
-	return code;
 }
 
-int isInstruction(const char* c){
+int is_instruction(const char* c){
 	if(strlen(c) != 128)
 		return 0;
 	for(int i=0; i<128; i++){
@@ -24,8 +22,8 @@ int isInstruction(const char* c){
 }
 
 //transform a sting (must be in the correct form) into an instruction
-Code* getCode(const char* c){
-	Code* code = initCode();
+size_t get_code(const char* c,code_t* code){
+	init_code(code);
 	int i;
 	unsigned char opc = 0;
 	unsigned char mode = 0;
@@ -102,11 +100,11 @@ Code* getCode(const char* c){
 	code->rm = rm;
 	code->displ = displ;
 	code->immediate = imm;
-	return code;
+	return 0;
 }
 
-int isValidCode(Code* code){
-	printCode(code);
+int is_valid_code(code_t* code){
+	print_code(code);
 	unsigned char oc = code->opcode;
 	unsigned char type = oc & 0xF; //extracts the 4 less significant bits
 	unsigned char class = oc >> 4; //extracts the 4 more significant bits
@@ -161,7 +159,7 @@ int isValidCode(Code* code){
 }
 
 
-void printCode(Code* code){
+void print_code(code_t* code){
 	
 	printf("*****************************\n");
 	printf("opcode: %u\n",code->opcode);

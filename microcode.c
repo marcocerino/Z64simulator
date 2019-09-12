@@ -1,6 +1,6 @@
 #include "microcode.h"
 
-char* generateMicrocode(Inst* i){
+char* generate_microcode(inst_t* i){
 
 	unsigned char type = i->opcode & 0xF;
 	unsigned char class = i->opcode >> 4;
@@ -86,7 +86,7 @@ char* generateMicrocode(Inst* i){
 
 
 //TODO: implement all the functions
-void getAddress(FILE*f, char* SoD,Boolean hasBase, Boolean hasIndex, Boolean hasDispl){
+void getAddress(FILE*f, char* SoD,boolean hasBase, boolean hasIndex, boolean hasDispl){
 	if(hasDispl && ! hasBase && ! hasIndex)
 		fprintf(f, "MAR<-TEMP1\n");
 	else if(!hasDispl && hasBase && !hasIndex)
@@ -111,7 +111,7 @@ char* hlt(){
 char* nope(){
 	printf("nope\n");
 	FILE * f = fopen("nope.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nIR<-MDR\n"); //fetch phase
 	fclose(f);
 	return "nope.txt";
 }
@@ -124,11 +124,11 @@ char* inte(){
 	return "int.txt";
 }
 
-char* mov(Operando* d, Operando*s){
+char* mov(operando_t* d, operando_t*s){
 	FILE* f = fopen("move.txt","w");
 
 	 //fetch phase
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nIR<-MDR\n");
 
 	//the destination is a register
 	if(d->t == REG){
@@ -139,7 +139,7 @@ char* mov(Operando* d, Operando*s){
 				fprintf(f, "DEST_REG<-IR[0:31]");
 			//source is longer than 2 bytes
 			else
-				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nDEST_REG<-MDR");
+				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nDEST_REG<-MDR");
 		}
 
 		//source is a register
@@ -150,7 +150,7 @@ char* mov(Operando* d, Operando*s){
 		//source is in memory
 		else{
 				getAddress(f,"SOURCE",s->hasBase,s->hasIndex,s->hasDispl);
-				fprintf(f, "MDR<-(MAR)\nDEST_REG<-MDR");
+				fprintf(f, "MDR<-(MAR)(0)\nMDR<-(MAR)(1)\nMDR<-(MAR)(2)\nDEST_REG<-MDR");
 			}
 	}
 
@@ -163,42 +163,42 @@ char* mov(Operando* d, Operando*s){
 		if(s->t == IMM){ 
 			//source is at max 2 bytes long
 			if(s->s <2)
-				fprintf(f, "(MAR)<-IR[0:31]");
+				fprintf(f, "MDR<-IR[0:31]\n(MAR)<-MDR\n");
 			//source is longer than 2 bytes
 			else
-				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\n(MAR)<-MDR");
+				fprintf(f, "MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\n(MAR)<-MDR");
 		}
 
 		//source is a register
 		else if(s->t == REG){
-			fprintf(f, "(MAR)<-SOURCE_REG" );
+			fprintf(f, "MDR<-SOURCE_REG\n(MAR)<-MDR\n" );
 		}
 	}
 	fclose(f);
 	return "move.txt";
 }
 
-char* push(Boolean flag, Operando* o){
+char* push(boolean flag, operando_t* o){
 
 	FILE * f = fopen("push.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nIR<-MDR\n"); //fetch phase
 	//MAR<-RSP
 	fprintf(f, "MAR<-RSP\n");
 	if(flag == T)
-		fprintf(f, "MDR<-FLAGS\nMAR<-MDR;RSP<-RSP-8");
+		fprintf(f, "MDR<-FLAGS\n(MAR)<-MDR;RSP<-RSP-8");
 	else
-		fprintf(f, "MDR<-SOURCE_REG\nMAR<-MDR;RSP<-RSP-8");
+		fprintf(f, "MDR<-SOURCE_REG\n(MAR)<-MDR;RSP<-RSP-8");
 	fclose(f);
 	return "push.txt";
 }
 
-char* pop(Boolean flag,Operando* o){
+char* pop(boolean flag,operando_t* o){
 	FILE * f = fopen("pop.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nIR<-MDR\n"); //fetch phase
 	//MAR<-RSP
 	fprintf(f, "MAR<-RSP\n");
 	if(flag == T)
-		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nFLAGS<-MDR\n");
+		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nTEM<-MDR\n");
 	else
 		fprintf(f, "MDR<-(MAR);RSP<-RSP-8\nDEST_REG<-MDR\n");
 	fclose(f);
@@ -206,9 +206,9 @@ char* pop(Boolean flag,Operando* o){
 }
 
 
-char * add(Operando* d, Operando* s){
+char * add(operando_t* d, operando_t* s){
 	FILE * f = fopen("add.txt","w");
-	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
+	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8(0)\nMDR<-(MAR);RIP<-RIP+8(1)\nMDR<-(MAR);RIP<-RIP+8(2)\nIR<-MDR\n"); //fetch phase
 	
 	
 	//source is an immediate
@@ -238,7 +238,7 @@ char * add(Operando* d, Operando* s){
 
 }
 
-char * sub(Operando* d, Operando* s){
+char * sub(operando_t* d, operando_t* s){
 	FILE * f = fopen("sub.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -271,12 +271,12 @@ char * sub(Operando* d, Operando* s){
 }
 
 
-char * adc(Operando* d, Operando* s){
+char * adc(operando_t* d, operando_t* s){
 	FILE * f = fopen("adc.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
 	//extract CF into TEMP1
-	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n")
+	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n");
 	
 	//source is an immediate
 	if(s->t == IMM)
@@ -310,12 +310,12 @@ char * adc(Operando* d, Operando* s){
 	return "adc.txt";
 
 }
-char * adc(Operando* d, Operando* s){
+char * sbb(operando_t* d, operando_t* s){
 	FILE * f = fopen("sbb.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
 	//extract CF into TEMP1
-	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n")
+	fprintf(f,"TEMP2<-FLAGS\nTEMP1<-Shifter_Out[0000,7]\n");
 	
 	//source is an immediate
 	if(s->t == IMM)
@@ -349,7 +349,7 @@ char * adc(Operando* d, Operando* s){
 	return "sbb.txt";
 
 }
-char * cmp(Operando * d, Operando* s){
+char * cmp(operando_t * d, operando_t* s){
 	FILE * f = fopen("cmp.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -379,7 +379,7 @@ char * cmp(Operando * d, Operando* s){
 	fclose(f);
 	return "cmp.txt";
 }
-char * test(Operando* d,Operando* s){
+char * test(operando_t* d,operando_t* s){
 	FILE * f = fopen("test.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -409,7 +409,7 @@ char * test(Operando* d,Operando* s){
 	fclose(f);
 	return "test.txt";
 }
-char* neg(Operando* d){
+char* neg(operando_t* d){
 	if(d->t == IMM){
 		error_handler("L'istruzione neg non ammette immediati");
 		return NULL;
@@ -422,7 +422,7 @@ char* neg(Operando* d){
 	return "neg.txt";
 }
 
-char * and(Operando* d,Operando* s){
+char * and(operando_t* d,operando_t* s){
 	FILE * f = fopen("and.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 
@@ -453,7 +453,7 @@ char * and(Operando* d,Operando* s){
 	return "and.txt";
 }
 
-char* or(Operando* d,Operando* s){
+char* or(operando_t* d,operando_t* s){
 	FILE * f = fopen("or.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -484,7 +484,7 @@ char* or(Operando* d,Operando* s){
 	return "or.txt";
 }
 
-char* xor(Operando* d,Operando* s){
+char* xor(operando_t* d,operando_t* s){
 	FILE * f = fopen("xor.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 	
@@ -515,7 +515,7 @@ char* xor(Operando* d,Operando* s){
 	return "xor.txt";
 }
 
-char * not(Operando* d){
+char * not(operando_t* d){
 	if(d->t == IMM){
 		error_handler("L'istruzione not non ammette immediati");
 		return NULL;
@@ -527,7 +527,7 @@ char * not(Operando* d){
 	return "not.txt";
 }
 
-char * bt(Operando* d, Operando* s){
+char * bt(operando_t* d, operando_t* s){
 	if(s->t != IMM){
 		error_handler("L'istruzione bt supporta solo un immediato come tipo di dato nella source");
 		return NULL;
@@ -537,10 +537,10 @@ char * bt(Operando* d, Operando* s){
 	
 	//TODO: how to write the correct bit on Flags reg
 	fclose(f);
-	return "bt.txt"
+	return "bt.txt";
 }
 
-char* shift(Inst* i){
+char* shift(inst_t* i){
 	FILE * f = fopen("shift.txt","w");
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n"); //fetch phase
 
@@ -571,7 +571,7 @@ char* shift(Inst* i){
 	return "shift.txt";
 }
 
-char* setFlags(int bit,Boolean setZero){
+char* setFlags(int bit,boolean setZero){
 	char * bits [5] ;
 	bits[0]="CF";
 	bits[1]="PF";
@@ -588,7 +588,7 @@ char* setFlags(int bit,Boolean setZero){
 }
 
 
-char* jump(Boolean isAbsolute,Operando* o){
+char* jump(boolean isAbsolute,operando_t* o){
 	FILE * f = fopen("jump.txt","w");
 	//fetch phase
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
@@ -603,7 +603,7 @@ char* jump(Boolean isAbsolute,Operando* o){
 }
 
 
-char* call(Boolean isAbsolute, Operando* o){
+char* call(boolean isAbsolute, operando_t* o){
 	FILE * f = fopen("call.txt","w");
 	//fetch phase
 	fprintf(f,"MAR<-RIP\nMDR<-(MAR);RIP<-RIP+8\nIR<-MDR\n");
@@ -630,7 +630,7 @@ char * ret(){
 
 }
 char* condJump(unsigned char opcode){
-	Boolean set;
+	boolean set;
 	int bit;
 	char * bits [5] ;
 	bits[0]="CF";
