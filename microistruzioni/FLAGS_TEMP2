@@ -1,0 +1,5 @@
+FLAGS<-TEMP2; Wflags=1, ShifterOpcode=00000, Bflagss=1
+microop/muop-shifter.png
+microop/muop-flags-from-shifter.png
+microop/muop-T2-write.png
+microop/muop-flags-write.png

@@ -1,0 +1,10 @@
+TEMP1<-DEST_REG; Wt1=1, Rm=1, Smux=2, REGmux=1
+microop/muop-data-bus.png
+microop/muop-T1-write.png
+microop/muop-ir-dest.png
+microop/muop-ir-dest-size.png
+microop/muop-REGMUX.png
+microop/muop-SMUX.png
+microop/muop-rax-read.png
+microop/muop-rax-sel.png
+microop/muop-rax.png

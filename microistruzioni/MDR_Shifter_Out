@@ -1,0 +1,5 @@
+MDR<-ALU_Out[...]; Bmdrin=1, opcode=..., Ba=1
+microop/muop-data-bus.png
+microop/muop-shifter-read.png
+microop/muop-shifter.png
+microop/muop-emdr-write-inside.png

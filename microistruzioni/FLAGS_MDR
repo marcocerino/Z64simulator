@@ -1,0 +1,5 @@
+FLAGS<-MDR; Bmdrout=1; Wflags=1;Bflagsdb=1
+microop/muop-data-bus.png
+microop/muop-flags-from-db.png
+microop/muop-flags-write.png
+microop/muop-emdr-read-inside.png

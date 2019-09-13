@@ -1,0 +1,8 @@
+MAR<-SOURCE_REG; Rm=1, Smux=1, REGmux=0, Wmar=1
+microop/muop-emar-write.png
+microop/muop-data-bus.png
+microop/muop-ir-source.png
+microop/muop-ir-source-size.png
+microop/muop-rcx-read.png
+microop/muop-rcx-sel.png
+microop/muop-rcx.png

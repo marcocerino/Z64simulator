@@ -1,0 +1,5 @@
+MAR<-ALU_Out[...] ;Wmar=1, ShifterOpcode=..., Ba=1, 
+microop/muop-data-bus.png
+microop/muop-emar-write.png
+microop/muop-alu-out.png
+microop/muop-alu.png

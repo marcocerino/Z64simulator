@@ -1,0 +1,5 @@
+TEMP2<-ALU_Out[...]; Wt2=1, ALUOpcode=..., Ba=1
+microop/muop-data-bus.png
+microop/muop-T2-write.png
+microop/muop-alu.png
+microop/muop-alu-out.png

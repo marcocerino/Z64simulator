@@ -1,0 +1,4 @@
+RIP<-IR[0:31]; Wrip=1,Bshort=1;
+microop/muop-data-bus.png
+microop/muop-rip-write.png
+microop/muop-ir-short.png

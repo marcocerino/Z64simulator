@@ -1,0 +1,5 @@
+MAR<-Shifter_out[...,x]; Wmar=1, ShifterOpcode=..., Bs=1, 
+microop/muop-data-bus.png
+microop/muop-emar-write.png
+microop/muop-shifter-read.png
+microop/muop-shifter.png

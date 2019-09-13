@@ -1,0 +1,11 @@
+DEST_REG<-MDR; Wm=1, Smux=2, REGmux=1,Bmdrout=1
+microop/muop-data-bus.png
+microop/muop-rcx-write.png
+microop/muop-rcx-sel.png
+microop/muop-data-bus.png
+microop/muop-emdr-read-inside.png
+microop/muop-ir-dest.png
+microop/muop-ir-dest-size.png
+microop/muop-REGMUX.png
+microop/muop-SMUX.png
+microop/muop-rax.png

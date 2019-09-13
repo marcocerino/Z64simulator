@@ -1,0 +1,10 @@
+TEMP2<-SOURCE_REG; Wt2=1, Smux=1, REGmux=0, Rm=1
+microop/muop-data-bus.png
+microop/muop-rax-sel.png
+microop/muop-rax.png
+microop/muop-rax-read.png
+microop/muop-T2-write.png
+microop/muop-ir-source.png
+microop/muop-ir-source-size.png
+microop/muop-REGMUX.png
+microop/muop-SMUX.png

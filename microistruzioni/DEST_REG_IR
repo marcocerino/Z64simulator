@@ -1,0 +1,10 @@
+DEST_REG<-IR[0:31]; Bshort=1, Wm=1, Smux=2,REGmux=1
+microop/muop-data-bus.png
+microop/muop-ir-short.png
+microop/muop-rax-write.png
+microop/muop-rax-sel.png
+microop/muop-rax.png
+microop/muop-ir-dest.png
+microop/muop-ir-dest-size.png
+microop/muop-REGMUX.png
+microop/muop-SMUX.png

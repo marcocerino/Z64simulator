@@ -1,0 +1,5 @@
+TEMP1<-Shifter_out[...,x]; Wt1=1, ShifterOpcode=..., Bs=1, 
+microop/muop-data-bus.png
+microop/muop-T1-write.png
+microop/muop-shifter-read.png
+microop/muop-shifter.png

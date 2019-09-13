@@ -1,0 +1,4 @@
+MDR<-FLAGS; Wmdr=1, Bmdrin=1, Bsr=1
+microop/muop-data-bus.png
+microop/muop-flags-read.png
+microop/muop-emdr-write-inside.png

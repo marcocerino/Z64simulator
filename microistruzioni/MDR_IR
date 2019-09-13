@@ -1,0 +1,4 @@
+MDR<-IR[0:31]; Wmdr=1, Bmdrin=1, Bshort=1
+microop/muop-ir-short.png
+microop/muop-data-bus.png
+microop/muop-emdr-write-inside.png

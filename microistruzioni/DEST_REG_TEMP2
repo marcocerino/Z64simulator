@@ -1,0 +1,12 @@
+DEST_REG<-TEMP2; ShifterOpcode=00000, Bs=1,Wm=1,Smux=2,REGmux=1
+microop/muop-data-bus.png
+microop/muop-ir-dest.png
+microop/muop-ir-dest-size.png
+microop/muop-T2-write.png
+microop/muop-rax-sel.png
+microop/muop-rax-write.png
+microop/muop-shifter.png
+microop/muop-shifter-read.png
+microop/muop-REGMUX.png
+microop/muop-SMUX.png
+microop/muop-rax.png

@@ -1,0 +1,4 @@
+MDR<-MAR; RIP<-RIP+8; INCrip=1, Bab=1
+microop/muop-rip-write.png
+microop/muop-rip-inc.png
+microop/muop-emar-read.png

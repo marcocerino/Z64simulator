@@ -1,0 +1,4 @@
+MAR<-IR[0:31]; Wmar=1, Bshort=1
+microop/muop-emar-write.png
+microop/muop-data-bus.png
+microop/muop-ir-short.png

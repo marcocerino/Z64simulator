@@ -1,0 +1,8 @@
+MAR<-DEST_REG; Rm=1, Smux=2, REGmux=1, Wmar=1
+microop/muop-emar-write.png
+microop/muop-data-bus.png
+microop/muop-ir-dest.png
+microop/muop-ir-dest-size.png
+microop/muop-rax-read.png
+microop/muop-rax-sel.png
+microop/muop-rax.png

@@ -1,0 +1,4 @@
+MDR<-(MAR); Bab=1, MRD=1, Bdbin=1
+microop/muop-emar-read.png
+microop/muop-MRD.png
+microop/muop-emdr-write-outside.png
