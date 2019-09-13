@@ -1,49 +1,53 @@
 #include "instruction.h"
 #include <stdio.h>
+typedef struct ret{
+	char* filename;
+	int num_pass;
+}ret_value_t;
 
-
-char* generate_microcode(inst_t* i);//wrapper calls the function that handle the specific instruction
+void generate_microcode(inst_t* i,ret_value_t* ret);//wrapper calls the function that handle the specific instruction
 
 //function to generate the microcode to get the address of an operator
-void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean hasDispl);//SoD must be either SOURCE or DEST
+void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean hasDispl,ret_value_t* ret);//SoD must be either SOURCE or DEST
 
+void fetch(ret_value_t* ret,FILE* f);
 //HW instruction
-char* hlt();
-char* nope();
-char* inte();
+void hlt(ret_value_t* ret);
+void nope(ret_value_t* ret);
+void inte(ret_value_t* ret);
 
 //data move instruction
-char* mov(operando_t* d,operando_t*s);
+void mov(operando_t* d,operando_t*s,ret_value_t* ret);
 //TODO: mov with sign extension
 //TODO: lea
-char* push(boolean flag,operando_t* s);
-char* pop(boolean flag,operando_t* s);
+void push(boolean flag,operando_t* s,ret_value_t* ret);
+void pop(boolean flag,operando_t* s,ret_value_t* ret);
 //TODO:movs and stos
 
 //ALU instr
-char * add(operando_t* d, operando_t* s);
-char * sub(operando_t* d, operando_t* s);
-char * adc(operando_t* d, operando_t* s);
-char * sbb(operando_t* d, operando_t* s);
-char * cmp(operando_t * d, operando_t* s);
-char * test(operando_t * d,operando_t* s);
-char * neg(operando_t* d);
-char * and(operando_t* d,operando_t* s);
-char* or(operando_t* d,operando_t* s);
-char* xor(operando_t* d,operando_t* s);
-char * not(operando_t* d);
-char * bt(operando_t* d, operando_t* s);
+void  add(operando_t* d, operando_t* s,ret_value_t* ret);
+void  sub(operando_t* d, operando_t* s,ret_value_t* ret);
+void  adc(operando_t* d, operando_t* s,ret_value_t* ret);
+void  sbb(operando_t* d, operando_t* s,ret_value_t* ret);
+void  cmp(operando_t * d, operando_t* s,ret_value_t* ret);
+void  test(operando_t * d,operando_t* s,ret_value_t* ret);
+void  neg(operando_t* d,ret_value_t* ret);
+void  and(operando_t* d,operando_t* s,ret_value_t* ret);
+void or(operando_t* d,operando_t* s,ret_value_t* ret);
+void xor(operando_t* d,operando_t* s,ret_value_t* ret);
+void  not(operando_t* d,ret_value_t* ret);
+void  bt(operando_t* d, operando_t* s,ret_value_t* ret);
 
 //shift inst
-char* shift(inst_t* i);
+void shift(inst_t* i,ret_value_t* ret);
 
 //Flags register instruction
-char* setFlags(int bit, boolean setZero);
+void setFlags(int bit, boolean setZero,ret_value_t* ret);
 
 //uncondition jump inst
-char* jump(boolean isAbsolute,operando_t* o);
-char* call(boolean isAbsolute, operando_t* o);
-char* ret();
+void jump(boolean isAbsolute,operando_t* o,ret_value_t* ret);
+void call(boolean isAbsolute, operando_t* o,ret_value_t* ret);
+void ret(ret_value_t* ret);
 
 //conditioned jump inst
-char* condJump(unsigned char opcode);
+void condJump(unsigned char opcode,ret_value_t* ret);
