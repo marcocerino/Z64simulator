@@ -85,9 +85,9 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 
 void fetch(ret_value_t* ret, FILE* f){
 	//MAR<-RIP
-	fprintf(f,"microistruzioni/MAR_RIP\n");
+	fprintf(f,"MAR_RIP\n");
 	//MDR<-(MAR); RIP<-RIP+8
-	fprintf(f,"microistruzioni/MDR_MAR_RIP\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\n");
+	fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
 	//IR<-MDR
 	fprintf(f,"IR_MDR\n"); 
 	ret->num_pass +=5;
@@ -96,42 +96,42 @@ void fetch(ret_value_t* ret, FILE* f){
 void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean hasDispl,ret_value_t* ret){
 	if(hasDispl && ! hasBase && ! hasIndex){
 		//MAR<-IR[0:31]
-		fprintf(f, "microistruzioni/MAR_IR\n" );
+		fprintf(f, "MAR_IR\n" );
 		ret->num_pass++;
 	}
 	else if(!hasDispl && hasBase && !hasIndex){
 		//MAR<-B
-		fprintf(f, "microistruzioni/MAR_%s_REG\n", SoD);
+		fprintf(f, "MAR_%s_REG\n", SoD);
 		ret->num_pass++;
 	}
 	else if(hasIndex){
 		//TEMP1<-I
 		//getIndex
 			//MAR<-RIP
-			fprintf(f,"microistruzioni/MAR_RIP\n");
+			fprintf(f,"MAR_RIP\n");
 			//MDR<-(MAR); RIP<-RIP+8
-			fprintf(f,"microistruzioni/MDR_MAR_RIP\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\n");
+			fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
 			//TEMP1<-MDR
-			fprintf(f,"microistruzioni/TEMP1_MDR\n"); 
+			fprintf(f,"TEMP1_MDR\n"); 
 		//MAR<-SHIFTER_OUT[SHL,T]
-		fprintf(f, "microistruzioni/MAR_Shifter_Out\n");
+		fprintf(f, "MAR_Shifter_Out\n");
 		//TEMP!<-MAR
-		fprintf(f, "microistruzioni/TEMP1_MAR\n");
+		fprintf(f, "TEMP1_MAR\n");
 		ret->num_pass+=7;
 		if(hasDispl){
 			//TEMP2<-IR[0:31]
-			fprintf(f,"microistruzioni/TEMP2_IR\n");
+			fprintf(f,"TEMP2_IR\n");
 			//MAR<-ALU_OUT[ADD
-			fprintf(f,"microistruzioni/MAR_ALU_Out\n");
+			fprintf(f,"MAR_ALU_Out\n");
 			//TEMP1<-MAR
-			fprintf(f, "microistruzioni/TEMP1_MAR\n");
+			fprintf(f, "TEMP1_MAR\n");
 			ret->num_pass+=3;	
 		}
 		if(hasBase){
 			//TEMP2<-B
-			fprintf(f, "microistruzioni/TEMP2_%s_REG\n", SoD);
+			fprintf(f, "TEMP2_%s_REG\n", SoD);
 			//MAR<-ALU_OUT{ADD}
-			fprintf(f, "microistruzioni/MAR_ALU_Out\n");
+			fprintf(f, "MAR_ALU_Out\n");
 			ret->num_pass+=2;
 		}
 
@@ -188,16 +188,16 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 			//source is at max 2 bytes long
 			if(s->s <2){
 				//DEST_REG<-IR
-				fprintf(f, "microistruzioni/DEST_REG_IR");
+				fprintf(f, "DEST_REG_IR");
 				ctr++;
 			}
 			//source is longer than 2 bytes
 			else{
 				//DEST_REG<-MDR
 					//MAR<-RIP
-					fprintf(f,"microistruzioni/MAR_RIP\n");
+					fprintf(f,"MAR_RIP\n");
 					//MDR<-(MAR); RIP<-RIP+8
-					fprintf(f,"microistruzioni/MDR_MAR_RIP\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\n");
+					fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
 					//IR<-MDR
 					fprintf(f,"DEST_REG_MDR\n"); 
 				ctr += 5;
@@ -208,7 +208,7 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 		else if(s->t == REG){
 			//TEMP2<-SOURCE_REG
 			//DEST_REG<-TEMP2
-			fprintf(f, "microistruzioni/TEMP2_SOURCE_REG\nmicroistruzioni/DEST_REG_TEMP2" );
+			fprintf(f, "TEMP2_SOURCE_REG\nDEST_REG_TEMP2" );
 			ctr+=2;
 		}
 
@@ -217,9 +217,9 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 			//GET SOURCE ADDRESS IN MAR
 			getAddress(f,"SOURCE",s->hasBase,s->hasIndex,s->hasDispl,ret);
 			//MDR<-(MAR)
-			fprintf(f, "microistruzioni/MDR_MAR_0\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\n");
+			fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2\n");
 			//DEST_REG<-MDR
-			fprintf(f,"microistruzioni/DEST_REG_MDR");
+			fprintf(f,"DEST_REG_MDR");
 			ctr +=4;
 		}
 	}
@@ -235,18 +235,18 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 			if(s->s <2){
 				//MDR<-IR[0:31]
 				//(MAR)<-MDR
-				fprintf(f, "microistruzioni/MDR_IR\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2\n");
+				fprintf(f, "MDR_IR\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2\n");
 				ctr+=4;
 			}
 			//source is longer than 2 bytes
 			else{
 				//(MAR)<-MDR
 					//MAR<-RIP
-					fprintf(f,"microistruzioni/MAR_RIP\n");
+					fprintf(f,"MAR_RIP\n");
 					//MDR<-(MAR); RIP<-RIP+8
-					fprintf(f,"microistruzioni/MDR_MAR_RIP\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\n");
+					fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
 					//(MAR)<-MDR
-					fprintf(f,"microistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2\n"); 
+					fprintf(f,"MAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2\n"); 
 				ctr+= 7;
 			}
 		}
@@ -255,7 +255,7 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 		else if(s->t == REG){
 			//MDR<-SOURCE_REG
 			//(MAR)<-MDR
-			fprintf(f, "microistruzioni/MDR_SOURCE_REG\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2\n" );
+			fprintf(f, "MDR_SOURCE_REG\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2\n" );
 			ctr +=4;
 		}
 	}
@@ -273,13 +273,13 @@ void push(boolean flag, operando_t* o,ret_value_t* ret){
 	if(flag == T){
 		//MDR<-FLAGS
 		//(MAR)<-MDR
-		fprintf(f, "microistruzioni/MDR_FLAGS\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2");
+		fprintf(f, "MDR_FLAGS\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
 		ctr +=4;
 	}
 	else{
 		//MDR<-SOURCE_REG
 		//(MAR)<-MDR
-		fprintf(f, "microistruzioni/MDR_SOURCE_REG\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2");
+		fprintf(f, "MDR_SOURCE_REG\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
 		ctr +=4;
 	}
 	fclose(f);
@@ -297,13 +297,13 @@ void pop(boolean flag, operando_t* o,ret_value_t* ret){
 	if(flag == T){
 		//MDR<-(MAR)
 		//FLAGS<-MDR
-		fprintf(f, "microistruzioni/MDR_MAR_0\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\nmicroistruzioni/FLAGS_MDR");
+		fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2\nFLAGS_MDR");
 		ctr +=4;
 	}
 	else{
 		//MDR<-(MAR)
 		//DEST_REG<-MDR
-		fprintf(f, "microistruzioni/MDR_MAR_0\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\nmicroistruzioni/DEST_REG_MDR");
+		fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2\nDEST_REG_MDR");
 		ctr +=4;
 	}
 	fclose(f);
@@ -319,7 +319,7 @@ void shift(inst_t* i,ret_value_t* ret){
 	//the dest value must be put in TEMP2
 	if(i->dest->t == REG){
 		//TEMP2<-DEST_REG;
-		fprintf(f,"microistruzioni/TEMP2_DEST_REG\n");
+		fprintf(f,"TEMP2_DEST_REG\n");
 		ctr ++;
 	}
 	else{
@@ -327,7 +327,7 @@ void shift(inst_t* i,ret_value_t* ret){
 		getAddress(f,"DEST",i->dest->hasBase,i->dest->hasIndex,i->dest->hasDispl,ret);
 		//MDR<-(MAR)
 		//TEMP2<-MDR
-		fprintf(f,"microistruzioni/MDR_MAR_0\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2\nmicroistruzioni/TEMP2_MDR\n");
+		fprintf(f,"MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2\nTEMP2_MDR\n");
 		ctr += 4;
 	}
 
@@ -337,14 +337,14 @@ void shift(inst_t* i,ret_value_t* ret){
 		//dest is a reg
 		if(i->dest->t == REG){
 			//DEST_REG<-SHIFTER_OUT
-			fprintf(f, "microistruzioni/DEST_REG_Shifter_Out");
+			fprintf(f, "DEST_REG_Shifter_Out");
 			ctr++;
 		}
 		//dest in memory
 		else{
 			//MDR<-SHIFTER_OUT
 			//(MAR)<-MDR
-			fprintf(f, "microistruzioni/MDR_Shifter_Out\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2");
+			fprintf(f, "MDR_Shifter_Out\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
 			ctr += 4;
 		}
 	}
@@ -353,14 +353,14 @@ void shift(inst_t* i,ret_value_t* ret){
 		//dest is a reg
 		if(i->dest->t == REG){
 			//DEST_REG<-SHIFTER_OUT
-			fprintf(f, "microistruzioni/DEST_REG_Shifter_Out");
+			fprintf(f, "DEST_REG_Shifter_Out");
 			ctr++;
 		}
 		//dest in memory
 		else{
 			//MDR<-SHIFTER_OUT
 			//(MAR)<-MDR
-			fprintf(f, "microistruzioni/MDR_Shifter_Out\nmicroistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2");
+			fprintf(f, "MDR_Shifter_Out\nMAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
 			ctr += 4;
 		}
 	
@@ -402,12 +402,12 @@ void jump(boolean isAbsolute,operando_t* o,ret_value_t* ret){
 		//TEMP1<-RIP
 		//TEMP2<-IR[0:31]
 		//RIP<-ALU_OUT[ADD]
-		fprintf(f, "microistruzioni/TEMP1_RIP\nmicroistruzioni/TEMP2_IR\nmicroistruzioni/RIP_ALU_Out");
+		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
 		ctr+=3;
 	}
 	else{
 		//RIP<-IR[0:31]
-		fprintf(f, "microistruzioni/RIP_IR");
+		fprintf(f, "RIP_IR");
 		ctr++;
 	}
 	fclose(f);
@@ -425,21 +425,21 @@ void call(boolean isAbsolute, operando_t* o,ret_value_t* ret){
 	//the call function has to copy the rip register in the stack
 	//TODO: cima dello stak su MAR
 	//MDR<-RIP
-	fprintf(f, "microistruzioni/MDR_RIP\n" );
+	fprintf(f, "MDR_RIP\n" );
 	//(MAR)<-MDR
-	fprintf(f, "microistruzioni/MAR_MDR_0\nmicroistruzioni/MAR_MDR_1\nmicroistruzioni/MAR_MDR_2");
+	fprintf(f, "MAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
 	ctr+=4;
 	//relative
 	if(isAbsolute == F){
 		//TEMP1<-RIP
 		//TEMP2<-IR[0:31]
 		//RIP<-ALU_OUT[ADD]
-		fprintf(f, "microistruzioni/TEMP1_RIP\nmicroistruzioni/TEMP2_IR\nmicroistruzioni/RIP_ALU_Out");
+		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
 		ctr+=3;
 	}
 	else{
 		//RIP<-IR[0:31]
-		fprintf(f, "microistruzioni/RIP_IR");
+		fprintf(f, "RIP_IR");
 		ctr++;
 	}
 	fclose(f);
@@ -454,9 +454,9 @@ void ret(ret_value_t* ret){
 	fetch(ret,f);
 	//TODO: cima dello stack su MAR
 	//MDR<-(MAR)
-	fprintf(f, "microistruzioni/MDR_MAR_0\nmicroistruzioni/MDR_MAR_1\nmicroistruzioni/MDR_MAR_2");
+	fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2");
 	//RIP<-MDR
-	fprintf(f, "microistruzioni/RIP_MDR\n");
+	fprintf(f, "RIP_MDR\n");
 	ctr += 4;
 	fclose(f);
 	ret->num_pass+=ctr;
@@ -496,7 +496,7 @@ void condJump(unsigned char opcode, ret_value_t * ret){
 	//TEMP1<-RIP
 	//TEMP2<-IR[0:31]
 	//RIP<-ALU_OUT[ADD]
-	fprintf(f, "microistruzioni/TEMP1_RIP\nmicroistruzioni/TEMP2_IR\nmicroistruzioni/RIP_ALU_Out");
+	fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
 
 	fclose(f);
 	ret->num_pass += ctr;
