@@ -1,6 +1,3 @@
-#to compile(before I write a makefile)
-gcc  main.c code.h code.c instruction.h instruction.c error_handler.h error_handler.c microcode.h microcode.c -o main_test `pkg-config gtk+-3.0  --cflags --libs` -lm
-
 INPUTS
 
 #error input
