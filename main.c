@@ -6,22 +6,43 @@
 //From here we define the first ui
 
 //callback function for go button
-void clicked (GtkButton* button, GtkEntry* entry){ //calback function when the go button is clicked
-    const char *s;
-    s = gtk_entry_get_text(entry);
+
+void clicked (GtkButton* button, GtkEntry* entry){ 
+    const char*s = gtk_entry_get_text(entry);
     printf("%s\n\n",s);
     if(!is_instruction(s)){
-        error_handler("La stringa inserita non è nel formato di una istruzione dell Z64"); //error_handler for a code that doesn't rappresent an instruction
+        error_handler("La stringa inserita non è nel formato di una istruzione dell Z64");
+         //error_handler for a code that doesn't rappresent an instruction
+        return;
     }
-    else{
-      code_t code;
-      get_code(s,&code);
-      if(is_valid_code(&code)){
-        inst_t * i = code_to_inst(&code);
-        print_inst(i);
-        char* p = generate_microcode(i);
-        printf("%s\n",p);
-      }
+    code_t code;
+    get_code(s,&code);
+    if(!is_valid_code(&code))
+      return;
+    inst_t * in = code_to_inst(&code);
+    print_inst(in);
+    ret_value_t ret;
+    generate_microcode(in,&ret);
+    printf("file: %s\n",ret.filename);
+    printf("numero microistruzioni: %d\n",ret.num_pass);
+    if(ret.num_pass == 0)
+      return;
+    pid_t pid=fork();
+    if (pid==0) { /* child process */
+
+    //TODO: funzione int to char*
+        char p = ret.num_pass + 48;
+        static char *argv[4];
+        argv[0] = "ui";
+        argv[1] =ret.filename;
+        argv[2] =&p;
+        argv[3] =NULL;
+        printf("%s\n",argv[1]);
+        printf("%s\n",argv[2]);
+        if(execvp("./ui",argv)<0)
+          printf("errore\n");
+
+        exit(127); /* only if execv fails */
     }
 }
 
