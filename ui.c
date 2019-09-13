@@ -38,6 +38,10 @@ void next(GtkButton* button, params_t* data){
   gtk_container_add(GTK_CONTAINER(data->o),image1);
 
   printf("%s\n",data->filename[ctr]);
+  if(data->filename[ctr][0] == 'I' && data->filename[ctr][1] == 'F'){
+    gtk_entry_set_text(data->t,data->filename[ctr]);
+    return;
+  }
   GtkWidget* i;
   char * buf = (char*)malloc(sizeof(char)*100);
   size_t line_length;
