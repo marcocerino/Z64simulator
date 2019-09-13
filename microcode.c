@@ -491,12 +491,14 @@ void condJump(unsigned char opcode, ret_value_t * ret){
 
 	//condition
 	fprintf(f, "IF FLAG[%s] == %d THEN\n",bits[bit], set);
+	ctr ++;
 
 	//new address
 	//TEMP1<-RIP
 	//TEMP2<-IR[0:31]
 	//RIP<-ALU_OUT[ADD]
 	fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
+	ctr+=3;
 
 	fclose(f);
 	ret->num_pass += ctr;
