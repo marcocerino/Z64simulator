@@ -10,18 +10,13 @@ typedef struct data{
   GtkEntry* t;
   GtkEntry* n;
   char**filename ;
+  char p;
 }params_t;
 
 void next(GtkButton* button, params_t* data){
-  if(ctr >= 5)
+  if(ctr >= data->p)
     ctr = 0;
   printf("%d\n",ctr);
-  FILE* f = fopen(data->filename[ctr],"r");
-  if(f== NULL){
-    printf("file non esistente %s\n",data->filename[ctr]);
-    return;
-  }
-  printf("fopen\n");
 
   char o = ctr+48;
   gtk_entry_set_text(data->n,&o);
@@ -38,10 +33,24 @@ void next(GtkButton* button, params_t* data){
   gtk_container_add(GTK_CONTAINER(data->o),image1);
 
   printf("%s\n",data->filename[ctr]);
-  if(data->filename[ctr][0] == 'I' && data->filename[ctr][1] == 'F'){
+  if(data->filename[ctr][16] == 'I' && data->filename[ctr][17] == 'F'){
+    printf("IF\n");
     gtk_entry_set_text(data->t,data->filename[ctr]);
+    ctr ++;
+
+    gtk_widget_show_all(GTK_WIDGET(data->o));
+    gtk_widget_show_all(GTK_WIDGET(data->t));
     return;
   }
+
+  FILE* f = fopen(data->filename[ctr],"r");
+  if(f== NULL){
+    printf("file non esistente %s\n",data->filename[ctr]);
+    return;
+  }
+  printf("fopen\n");
+
+
   GtkWidget* i;
   char * buf = (char*)malloc(sizeof(char)*100);
   size_t line_length;
@@ -72,7 +81,7 @@ void delete_event(GtkWidget *widget, gpointer data){//callback function for x bu
     gtk_main_quit ();
 }
 
-int show (int argc, char **argv,char** arr){
+int show (int argc, char **argv,char** arr, char p,char* file_text,char* window_name){
   
 
   GtkWidget *window;
@@ -82,12 +91,13 @@ int show (int argc, char **argv,char** arr){
   GtkWidget *button;
   GtkWidget *text;
   GtkWidget* number;
+  GtkWidget* file_txt;
 
   gtk_init(&argc,&argv);
 
   //create the window
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (window), "Z64 Simulator");
+  gtk_window_set_title (GTK_WINDOW (window), window_name);
   gtk_window_set_resizable(GTK_WINDOW(window),0);
   g_signal_connect (window, "delete_event",G_CALLBACK (delete_event), NULL);
 
@@ -95,6 +105,12 @@ int show (int argc, char **argv,char** arr){
   grid = gtk_grid_new();
   gtk_container_add(GTK_CONTAINER(window), grid);
   gtk_grid_set_row_baseline_position(GTK_GRID(grid),0,GTK_BASELINE_POSITION_CENTER);
+
+  GtkTextBuffer * buff = gtk_text_buffer_new(NULL);
+  gtk_text_buffer_set_text(buff,file_text,-1);
+  file_txt = gtk_text_view_new_with_buffer(buff);
+  gtk_grid_attach(GTK_GRID(grid),file_txt,0,0,1,1);
+
 
   number = gtk_entry_new();
   gtk_editable_set_editable(GTK_EDITABLE(number),FALSE);
@@ -119,6 +135,7 @@ int show (int argc, char **argv,char** arr){
   data->im = GTK_IMAGE(image1);
   data->t = GTK_ENTRY(text);
   data->n = GTK_ENTRY(number);
+  data->p =p;
 
   button = gtk_button_new_with_label ("GO!");
   g_signal_connect (button, "clicked", G_CALLBACK (next), data);
@@ -135,9 +152,12 @@ int show (int argc, char **argv,char** arr){
 int main(int argc, char ** argv){
   if(argc< 3)
     return -1;
+  //TODO: funzione string to int
   char p = argv[2][0] -48;
   char* file = argv[1];
+  printf("opening %s\nIt has %u pass\n",file,p);
   char ** arr = (char**)malloc(sizeof(char*)*p);
+  char file_text[500];
    FILE* f = fopen(file,"r");
     char aux[p][50];
     int i;
@@ -147,6 +167,7 @@ int main(int argc, char ** argv){
     char * buf = (char*)malloc(sizeof(char)*100);
     size_t line_length;
     while(i<p && getline(&buf,&line_length,f) > 0){
+      strcat(file_text,buf);
       if(buf[strlen(buf)-1] == '\n')
         buf[strlen(buf)-1] = 0;
       printf("buf: %s\n",buf);
@@ -160,6 +181,6 @@ int main(int argc, char ** argv){
   }
   printf("calling show\n");
 
-  show(argc,argv,arr);
+  show(argc,argv,arr,p,file_text,argv[1]);
   return 1;
 }
