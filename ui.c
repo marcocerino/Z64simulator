@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stdio.h>
+#include "useful.h"
 
 int ctr = 0;
 
@@ -10,7 +11,7 @@ typedef struct data{
   GtkEntry* t;
   GtkEntry* n;
   char**filename ;
-  char p;
+  int p;
 }params_t;
 
 void next(GtkButton* button, params_t* data){
@@ -18,8 +19,9 @@ void next(GtkButton* button, params_t* data){
     ctr = 0;
   printf("%d\n",ctr);
 
-  char o = ctr+48;
-  gtk_entry_set_text(data->n,&o);
+  char o[2];
+  itos(ctr+1,o);
+  gtk_entry_set_text(data->n,o);
 
   GList *children, *iter;
 
@@ -81,7 +83,7 @@ void delete_event(GtkWidget *widget, gpointer data){//callback function for x bu
     gtk_main_quit ();
 }
 
-int show (int argc, char **argv,char** arr, char p,char* file_text,char* window_name){
+int show (int argc, char **argv,char** arr, int p,char* file_text,char* window_name){
   
 
   GtkWidget *window;
@@ -152,8 +154,8 @@ int show (int argc, char **argv,char** arr, char p,char* file_text,char* window_
 int main(int argc, char ** argv){
   if(argc< 3)
     return -1;
-  //TODO: funzione string to int
-  char p = argv[2][0] -48;
+  int p;
+  stoi(argv[2],&p);
   char* file = argv[1];
   printf("opening %s\nIt has %u pass\n",file,p);
   char ** arr = (char**)malloc(sizeof(char*)*p);
