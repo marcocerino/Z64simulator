@@ -117,18 +117,12 @@ void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean has
 	}
 	else if(hasIndex){
 		//TEMP1<-I
-		//getIndex
-			//MAR<-RIP
-			fprintf(f,"MAR_RIP\n");
-			//MDR<-(MAR); RIP<-RIP+8
-			fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
-			//TEMP1<-MDR
-			fprintf(f,"TEMP1_MDR\n"); 
+		fprintf(f,"TEMP1_INDEX\n");
 		//MAR<-SHIFTER_OUT[SHL,T]
 		fprintf(f, "MAR_Shifter_Out\n");
 		//TEMP!<-MAR
 		fprintf(f, "TEMP1_MAR\n");
-		ret->num_pass+=7;
+		ret->num_pass+=3;
 		if(hasDispl){
 			//TEMP2<-IR[0:31]
 			fprintf(f,"TEMP2_IR\n");
