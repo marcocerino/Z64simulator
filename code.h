@@ -21,6 +21,9 @@ int is_instruction(const char* c);
 
 //transform a sting (must be in the correct form) into an instruction
 size_t get_code(const char* c,code_t* code);
+size_t get_code_bits(const char* c,code_t* code);
+size_t get_code_mask(const char* c,code_t* code);
+
 
 //return 1 if the istruction is valid and exist in the Z64 instructions; 0 is it doesn't
 int is_valid_code(code_t* code);
