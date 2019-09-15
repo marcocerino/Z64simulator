@@ -1,4 +1,4 @@
-MAR<-ALU_Out[...] ;Wmar=1, ALUOpcode=..., Ba=1, Wflags =1,Blags=1
+MAR<-ALU_Out[ADD] ;Wmar=1, ALUOpcode=0000, Ba=1, Wflags =1,Blags=1
 microop/muop-data-bus.png
 microop/muop-emar-write.png
 microop/muop-alu-out.png
