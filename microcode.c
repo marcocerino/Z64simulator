@@ -30,32 +30,43 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 		if(type == 7)
 			 pop(T,NULL,t);
 		//TODO: movs and stos
-	}/*
+	}
 	else if (class == 2){
 		if(type == 0)
-			 add(i->dest,i->source,t);
+			//add
+			 alu(i->dest,i->source,t,"ADD",0,1);
 		else if(type == 1)
-			 sub(i->dest,i->source,t);
+			//sub
+			 alu(i->dest,i->source,t,"SUB",0,1);
 		else if(type == 2)
-			 adc(i->dest,i->source,t);
+			//adc
+			 alu(i->dest,i->source,t,"ADD",1,1);
 		else if(type == 3)
-			 sbb(i->dest,i->source,t);
+			//sbb
+			 alu(i->dest,i->source,t,"SUB",1,1);
 		else if(type == 4)
-			 cmp(i->dest,i->source,t);
+			//cmp
+			 alu(i->dest,i->source,t,"SUB",0,0);
 		else if(type == 5)
-			 test(i->dest,i->source,t);
-		//TODO:  neg
+			//test
+			 alu(i->dest,i->source,t,"AND",0,0);
+		//TODO:  neg*/
 		else if(type == 7)
-			 and(i->dest,i->source,t);
+			//and
+			 alu(i->dest,i->source,t,"AND",0,1);
 		else if(type == 8)
-			 or(i->dest,i->source,t);
+			//or
+			 alu(i->dest,i->source,t,"OR",0,1);
 		else if(type == 9)
-			 xor(i->dest,i->source,t);
+			//xor
+			 alu(i->dest,i->source,t,"XOR",0,1);
+			/*
 		else if(type == 10)
 			 not(i->dest,t);
 		else if(type == 11)
 			 bt(i->dest,i->source,t);
-	}*/
+			 */
+	}
 	else if(class == 3){
 		 shift(i,t);
 	}
@@ -121,8 +132,8 @@ void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean has
 		if(hasDispl){
 			//TEMP2<-IR[0:31]
 			fprintf(f,"TEMP2_IR\n");
-			//MAR<-ALU_OUT[ADD
-			fprintf(f,"MAR_ALU_Out\n");
+			//MAR<-ALU_OUT[ADD]
+			fprintf(f,"MAR_ALU_Out_ADD\n");
 			//TEMP1<-MAR
 			fprintf(f, "TEMP1_MAR\n");
 			ret->num_pass+=3;	
@@ -131,7 +142,7 @@ void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean has
 			//TEMP2<-B
 			fprintf(f, "TEMP2_%s_REG\n", SoD);
 			//MAR<-ALU_OUT{ADD}
-			fprintf(f, "MAR_ALU_Out\n");
+			fprintf(f, "MAR_ALU_Out_ADD\n");
 			ret->num_pass+=2;
 		}
 
@@ -311,6 +322,98 @@ void pop(boolean flag, operando_t* o,ret_value_t* ret){
 }	
 
 
+void  alu(operando_t* d, operando_t* s,ret_value_t* ret,char* op,int cf, int save ){
+	int ctr = 0;
+	FILE * f = fopen("alu.txt","w");
+	ret->filename = "alu.txt";
+	//fetch phase
+	fetch(ret,f);
+	//source is an immediate
+	if(s->t == IMM){
+		if(s->s <2){
+			//TEMP2<-IR
+			fprintf(f,"TEMP2_IR\n");
+			ctr++;
+		}
+		else{
+			//MAR<-RIP
+			fprintf(f,"MAR_RIP\n");
+			//MDR<-(MAR); RIP<-RIP+8
+			fprintf(f,"MDR_MAR_RIP\nMDR_MAR_1\nMDR_MAR_2\n");
+			//TEMP2IR<-MDR
+			fprintf(f,"TEMP2_MDR\n"); 
+			ctr +=5;
+		}
+	}
+	//source is a reg
+	else if (s->t == REG){
+		//TEMP2<-SOURCE_REG
+		fprintf(f, "TEMP2_SOURCE_REG\n");
+		ctr++;
+	}
+	//source is in memory
+	else{
+		//address in MAR
+		getAddress(f,"SOURCE",d->hasBase,d->hasIndex,d->hasDispl,ret);
+		//MDR<-(MAR)
+		fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2");
+		//TEMP2<-MDR
+		fprintf(f, "TEMP2_MDR\n");
+		ctr +=4;
+	}
+	//dest is a reg
+	if(d->t == REG){
+		//TEMP1<-DEST_REG
+		fprintf(f, "TEMP1_DEST_REG\n" );
+		ctr ++;
+		if(cf){
+			//MDR<-ALU_Out[op]
+			fprintf(f, "MDR_ALU_Out_%s\n",op);
+			//TEMP2<-FLAGS
+			fprintf(f, "TEMP2_FLAGS\n");
+			//TEMP1<-MDR
+			fprintf(f, "TEMP1_MDR\n" );
+			ctr +=3;
+		}
+		if(save){
+			//DEST_REG<-ALU_Out[op]
+			fprintf(f, "DEST_REG_ALU_Out_%s\n",op);
+			ctr ++;
+		}
+	}
+	//dest is in memory
+	else{
+		//address in MAR
+		getAddress(f,"DEST",d->hasBase,d->hasIndex,d->hasDispl,ret);
+		//MDR<-(MAR)
+		fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2");
+		//TEMP1<-MDR
+		fprintf(f, "TEMP1_MDR\n");
+		ctr +=4;
+		if(cf){
+			//MDR<-ALU_Out[op]
+			fprintf(f, "MDR_ALU_Out_%s\n",op);
+			//TEMP2<-FLAGS
+			fprintf(f, "TEMP2_FLAGS\n");
+			//TEMP1<-MDR
+			fprintf(f, "TEMP1_MDR\n" );
+			ctr +=3;
+
+		}
+		if(save){
+			//MDR<-ALU_Out[op]
+			fprintf(f, "MDR_ALU_Out_%s\n",op);
+			//(MAR)<-MDR
+			fprintf(f, "MAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
+			ctr += 4;
+		}	
+
+	}
+	fclose(f);
+	ret->num_pass += ctr;
+
+}
+
 void shift(inst_t* i,ret_value_t* ret){
 	int ctr;
 	FILE * f = fopen("shift.txt","w");
@@ -402,7 +505,7 @@ void jump(boolean isAbsolute,operando_t* o,ret_value_t* ret){
 		//TEMP1<-RIP
 		//TEMP2<-IR[0:31]
 		//RIP<-ALU_OUT[ADD]
-		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
+		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out_ADD");
 		ctr+=3;
 	}
 	else{
@@ -434,7 +537,7 @@ void call(boolean isAbsolute, operando_t* o,ret_value_t* ret){
 		//TEMP1<-RIP
 		//TEMP2<-IR[0:31]
 		//RIP<-ALU_OUT[ADD]
-		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
+		fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out_ADD");
 		ctr+=3;
 	}
 	else{
@@ -497,7 +600,7 @@ void condJump(unsigned char opcode, ret_value_t * ret){
 	//TEMP1<-RIP
 	//TEMP2<-IR[0:31]
 	//RIP<-ALU_OUT[ADD]
-	fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out");
+	fprintf(f, "TEMP1_RIP\nTEMP2_IR\nRIP_ALU_Out_ADD");
 	ctr+=3;
 
 	fclose(f);

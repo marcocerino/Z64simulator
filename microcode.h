@@ -25,16 +25,10 @@ void pop(boolean flag,operando_t* s,ret_value_t* ret);
 //TODO:movs and stos
 
 //ALU instr
-void  add(operando_t* d, operando_t* s,ret_value_t* ret);
-void  sub(operando_t* d, operando_t* s,ret_value_t* ret);
-void  adc(operando_t* d, operando_t* s,ret_value_t* ret);
-void  sbb(operando_t* d, operando_t* s,ret_value_t* ret);
-void  cmp(operando_t * d, operando_t* s,ret_value_t* ret);
-void  test(operando_t * d,operando_t* s,ret_value_t* ret);
-void  neg(operando_t* d,ret_value_t* ret);
-void  and(operando_t* d,operando_t* s,ret_value_t* ret);
-void or(operando_t* d,operando_t* s,ret_value_t* ret);
-void xor(operando_t* d,operando_t* s,ret_value_t* ret);
+//op must be in [ADD,SUB,AND,OR,XOR]
+//cf is a boolena if cf is involved
+//save is a boolean if the result should be saved in dest
+void  alu(operando_t* d, operando_t* s,ret_value_t* ret,char* op,int cf,int save);
 void  not(operando_t* d,ret_value_t* ret);
 void  bt(operando_t* d, operando_t* s,ret_value_t* ret);
 
