@@ -1,5 +1,7 @@
-RIP<-ALU_Out[...]; Wpir=1, ALUOpcode=..., Ba=1
+RIP<-ALU_Out[ADD]; Wpir=1, ALUOpcode=0000, Ba=1, Wflags =1, Bflagsa=1
 microop/muop-data-bus.png
 microop/muop-rip-write.png
 microop/muop-alu-out.png
 microop/muop-alu.png
+microop/muop-flags-from-alu.png
+microop/muop-flags-write.png
