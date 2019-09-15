@@ -1,4 +1,4 @@
-MDR<-ALU_Out[...]; Aopcode=1, Wflags=1, Bflagsa=1,Bmdrin=1, Wmdr=1
+MDR<-ALU_Out[OR]; Aopcode=0011, Wflags=1, Bflagsa=1,Bmdrin=1, Wmdr=1
 microop/muop-data-bus.png
 microop/muop-alu-out.png
 microop/muop-alu.png
