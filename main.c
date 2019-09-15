@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "error_handler.h"
 #include "microcode.h"
+#include "useful.h"
 
 //From here we define the first ui
 
@@ -31,11 +32,12 @@ void clicked (GtkButton* button, GtkEntry* entry){
     if (pid==0) { /* child process */
 
     //TODO: funzione int to char*
-        char p = ret.num_pass + 48;
+        char p[2];;
+        itos(ret.num_pass,p);
         static char *argv[4];
         argv[0] = "ui";
         argv[1] =ret.filename;
-        argv[2] =&p;
+        argv[2] =p;
         argv[3] =NULL;
         printf("%s\n",argv[1]);
         printf("%s\n",argv[2]);
