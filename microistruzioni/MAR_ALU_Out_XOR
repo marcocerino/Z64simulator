@@ -1,0 +1,7 @@
+MAR<-ALU_Out[XOR] ;Wmar=1, ALUOpcode=..., Ba=1, Wflags =1,Blags=1
+microop/muop-data-bus.png
+microop/muop-emar-write.png
+microop/muop-alu-out.png
+microop/muop-alu.png
+microop/muop-flags-from-alu.png
+microop/muop-flags-write.png

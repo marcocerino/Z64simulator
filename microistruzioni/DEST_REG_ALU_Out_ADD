@@ -1,4 +1,4 @@
-DEST_REG<-ALU_Out[...]; Wm=1,Smux=2,REGmux=1, Aopcode=..., Ba=1
+DEST_REG<-ALU_Out[ADD]; Wm=1,Smux=2,REGmux=1, Aopcode=0000, Ba=1
 microop/muop-data-bus.png
 microop/muop-ir-dest.png
 microop/muop-ir-dest-size.png
