@@ -1,0 +1,7 @@
+MAR<-RSP; Wmar=1, Smux=0, REGmux=4, Rm=1
+microop/muop-emar-write.png
+microop/muop-data-bus.png
+microop/muop-rax-read.png
+microop/muop-rax-sel.png
+microop/muop-rax.png
+microop/muop-ir-index-size.png
