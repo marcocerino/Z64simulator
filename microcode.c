@@ -19,8 +19,9 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 	else if(class == 1){
 		if(type == 0)
 			 mov(i->dest,i->source,t);
-		//TODO: come fare esenzione del segno
-		//TODO: lea
+		//TODO: movs,movz come fare esenzione del segno
+		if(type == 3)
+			lea(i->dest,i->source,t);
 		else if(type == 4)
 			 push(F,i->source,t);
 		if(type == 5)
@@ -50,7 +51,9 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 		else if(type == 5)
 			//test
 			 alu(i->dest,i->source,t,"AND",0,0);
-		//TODO:  neg*/
+		else if(type == 6)
+			//neg
+			complemento(i->source,t,2);
 		else if(type == 7)
 			//and
 			 alu(i->dest,i->source,t,"AND",0,1);
@@ -60,9 +63,10 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 		else if(type == 9)
 			//xor
 			 alu(i->dest,i->source,t,"XOR",0,1);
-			/*
+			
 		else if(type == 10)
-			 not(i->dest,t);
+			//not
+			 complemento(i->dest,t,1);/*
 		else if(type == 11)
 			 bt(i->dest,i->source,t);
 			 */
@@ -142,8 +146,6 @@ void getAddress(FILE* f,char* SoD,boolean hasBase, boolean hasIndex, boolean has
 
 	}
 }
-//TODO: implement all the functions
-
 void hlt(ret_value_t* ret){
 	char* filename = "hlt.txt";
 	ret->filename=filename;
@@ -268,13 +270,39 @@ void mov(operando_t* d, operando_t*s,ret_value_t* ret){
 	ret->num_pass += ctr;
 }
 
+void lea(operando_t*d,operando_t*s,ret_value_t*ret){
+	int ctr = 0;
+	FILE * f = fopen("lea.txt","w");
+	ret->filename = "lea.txt";
+	if(d->t != REG){
+		error_handler("l'istruzione lea non deve avere un registro come dest\n");
+		ret->num_pass=-1;
+		return;
+	}
+	if(s->t == REG){
+		fprintf(f,"TEMP2_SOURCE_REG\nDEST_REG_TEMP2");
+		ctr +=2;
+	}
+	else if(s->t == IMM){
+		getAddress(f,"SOURCE",s->hasBase,s->hasIndex,s->hasIndex,ret);
+		//DEST_REG<-MAR
+		fprintf(f, "DEST_REG_MAR\n");
+		ctr++;
+	}
+	fclose(f);
+	ret->num_pass += ctr;
+}
+
 void push(boolean flag, operando_t* o,ret_value_t* ret){
 	int ctr = 0;
 	FILE * f = fopen("push.txt","w");
 	ret->filename = "push.txt";
 	//fetch phase
 	fetch(ret,f);
-	//TODO: stack head on MAR
+	//MAR<-RSP
+	fprintf(f, "MAR_RSP\n");
+	ctr++;
+
 	if(flag == T){
 		//MDR<-FLAGS
 		//(MAR)<-MDR
@@ -298,7 +326,9 @@ void pop(boolean flag, operando_t* o,ret_value_t* ret){
 	ret->filename = "pop.txt";
 	//fetch phase
 	fetch(ret,f);
-	//TODO: stack head on MAR
+	//MAR<-RSP
+	fprintf(f, "MAR_RSP\n");
+	ctr++;
 	if(flag == T){
 		//MDR<-(MAR)
 		//FLAGS<-MDR
@@ -408,9 +438,47 @@ void  alu(operando_t* d, operando_t* s,ret_value_t* ret,char* op,int cf, int sav
 
 }
 
+void complemento(operando_t* o,ret_value_t* ret, int comp){
+	int ctr;
+	FILE * f = fopen("neg.txt","w");
+	ret->filename = "neg.txt";
+	fetch(ret,f);
+	if(o->t == REG){
+		//TEMP1<-DEST_REG
+		fprintf(f, "TEMP1_DEST_REG\n");
+		ctr++;
+	}
+	else{
+		getAddress(f,"DEST",o->hasBase,o->hasIndex,o->hasDispl,ret);
+		//MDR<-(MAR)
+		fprintf(f,"MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2\n");
+		fprintf(f,"TEMP1_MDR\n");
+		ctr+=4;
+	}
+	//TODO: TEMP2<-0xFFFF
+	if(comp == 2){
+		if(o->t == REG){
+			//DEST_REG<-ALU_OUT[XOR]
+			fprintf(f,"DEST_REG_ALU_Out_XOR");
+			ctr++;
+		}
+		else{
+			//MDR<-ALU_OUT[XOR}]
+			fprintf(f,"MDR_ALU_Out_XOR\n");
+			//(MAR)<-MDR
+			fprintf(f, "MAR_MDR_0\nMAR_MDR_1\nMAR_MDR_2");
+			ctr+=4;
+		}
+	}
+	fclose(f);
+	ret->num_pass +=ctr;
+}
+
 void shift(inst_t* i,ret_value_t* ret){
+	//TODO: complete 
 	int ctr;
 	FILE * f = fopen("shift.txt","w");
+	ret->filename = "shift.txt";
 	fetch(ret,f);
 
 	//the dest value must be put in TEMP2
@@ -520,7 +588,9 @@ void call(boolean isAbsolute, operando_t* o,ret_value_t* ret){
 	fetch(ret,f);
 	
 	//the call function has to copy the rip register in the stack
-	//TODO: cima dello stak su MAR
+	//MAR<-RSP
+	fprintf(f, "MAR_RSP\n");
+	ctr++;
 	//MDR<-RIP
 	fprintf(f, "MDR_RIP\n" );
 	//(MAR)<-MDR
@@ -549,7 +619,9 @@ void ret(ret_value_t* ret){
 	int ctr =0;
 	//fetch phase
 	fetch(ret,f);
-	//TODO: cima dello stack su MAR
+	//MAR<-RSP
+	fprintf(f, "MAR_RSP\n");
+	ctr++;
 	//MDR<-(MAR)
 	fprintf(f, "MDR_MAR_0\nMDR_MAR_1\nMDR_MAR_2");
 	//RIP<-MDR

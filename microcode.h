@@ -19,7 +19,7 @@ void inte(ret_value_t* ret);
 //data move instruction
 void mov(operando_t* d,operando_t*s,ret_value_t* ret);
 //TODO: mov with sign extension
-//TODO: lea
+void lea(operando_t*d,operando_t*s,ret_value_t*ret);
 void push(boolean flag,operando_t* s,ret_value_t* ret);
 void pop(boolean flag,operando_t* s,ret_value_t* ret);
 //TODO:movs and stos
@@ -29,8 +29,10 @@ void pop(boolean flag,operando_t* s,ret_value_t* ret);
 //cf is a boolena if cf is involved
 //save is a boolean if the result should be saved in dest
 void  alu(operando_t* d, operando_t* s,ret_value_t* ret,char* op,int cf,int save);
-void  not(operando_t* d,ret_value_t* ret);
-void  bt(operando_t* d, operando_t* s,ret_value_t* ret);
+
+//complemento a 1 o a 2
+void complemento(operando_t* o,ret_value_t* ret,int comp);
+//TODO:  bt
 
 //shift inst
 void shift(inst_t* i,ret_value_t* ret);
