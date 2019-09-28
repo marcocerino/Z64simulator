@@ -17,7 +17,6 @@ typedef struct data{
 void next(GtkButton* button, params_t* data){
   if(ctr >= data->p)
     ctr = 0;
-  printf("%d\n",ctr);
 
   char o[2];
   itos(ctr+1,o);
@@ -34,9 +33,8 @@ void next(GtkButton* button, params_t* data){
   image1 = gtk_image_new_from_file("microop/muop-architecture.png");
   gtk_container_add(GTK_CONTAINER(data->o),image1);
 
-  printf("%s\n",data->filename[ctr]);
   if(data->filename[ctr][16] == 'I' && data->filename[ctr][17] == 'F'){
-    printf("IF\n");
+    
     gtk_entry_set_text(data->t,data->filename[ctr]);
     ctr ++;
 
@@ -50,7 +48,6 @@ void next(GtkButton* button, params_t* data){
     printf("file non esistente %s\n",data->filename[ctr]);
     return;
   }
-  printf("fopen\n");
 
 
   GtkWidget* i;
@@ -58,7 +55,6 @@ void next(GtkButton* button, params_t* data){
   size_t line_length;
   int k = 0;
   while(getline(&buf,&line_length,f) > 0){
-    printf("buf: %s\n",buf);
     if(buf[strlen(buf)-1]== '\n')
         buf[strlen(buf)-1] = 0;
       if(k==0){
@@ -69,7 +65,6 @@ void next(GtkButton* button, params_t* data){
         gtk_overlay_add_overlay(data->o,i);
       }
       k++;
-    printf("%s\n",buf);
   }
   if(buf)
     free(buf);
@@ -172,7 +167,6 @@ int main(int argc, char ** argv){
       strcat(file_text,buf);
       if(buf[strlen(buf)-1] == '\n')
         buf[strlen(buf)-1] = 0;
-      printf("buf: %s\n",buf);
       strcat(aux[i],buf);
       i++;
     }

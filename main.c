@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
+#include <sys/wait.h>
 #include "error_handler.h"
 #include "microcode.h"
 #include "useful.h"
@@ -22,10 +23,9 @@ void clicked (GtkButton* button, GtkEntry* entry){
       return;
     inst_t * in = code_to_inst(&code);
     print_inst(in);
-    ret_value_t ret;
+    ret_value_t ret = {0};
     generate_microcode(in,&ret);
-    printf("file: %s\n",ret.filename);
-    printf("numero microistruzioni: %d\n",ret.num_pass);
+    printf("\n");
     if(ret.num_pass == 0)
       return;
     pid_t pid=fork();
@@ -39,8 +39,7 @@ void clicked (GtkButton* button, GtkEntry* entry){
         argv[1] =ret.filename;
         argv[2] =p;
         argv[3] =NULL;
-        printf("%s\n",argv[1]);
-        printf("%s\n",argv[2]);
+        printf("calling : ./ui %s %s",argv[1],argv[2]);
         if(execvp("./ui",argv)<0)
           printf("errore\n");
 
@@ -77,7 +76,7 @@ int main (int argc, char **argv){
 
   //create the header text
   GtkTextBuffer * buff = gtk_text_buffer_new(NULL);
-  gtk_text_buffer_set_text(buff,"Inseire il codice dell'istruzione dello Z64",-1);
+  gtk_text_buffer_set_text(buff,"Inserire il codice dell'istruzione dello Z64",-1);
   text = gtk_text_view_new_with_buffer(buff);
   gtk_grid_attach(GTK_GRID(grid),text,0,0,1,1);
 

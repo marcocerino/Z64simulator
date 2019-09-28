@@ -39,13 +39,13 @@ inst_t* code_to_inst(code_t* c){
 	Index = c->sib & 0xF;
 
 	printf("Mem: %u\n",Mem);
-	printf("DI; %u\n",DI);
-	printf("DS; %u\n",DS);
-	printf("SS; %u\n",SS);
-	printf("Bp; %u\n",Bp);
-	printf("Ip; %u\n",Ip);
-	printf("scale; %u\n",Scale);
-	printf("Index; %u\n",Index);
+	printf("DI: %u\n",DI);
+	printf("DS: %u\n",DS);
+	printf("SS: %u\n",SS);
+	printf("Bp: %u\n",Bp);
+	printf("Ip: %u\n",Ip);
+	printf("scale: %u\n",Scale);
+	printf("Index: %u\n",Index);
 
 	//both operator are reg || source might be an immediate
 	if(Mem == 0){
