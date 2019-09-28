@@ -474,7 +474,6 @@ void complemento(operando_t* o,ret_value_t* ret, int comp){
 }
 
 void shift(inst_t* i,ret_value_t* ret){
-	//TODO: complete 
 	int ctr;
 	FILE * f = fopen("shift.txt","w");
 	ret->filename = "shift.txt";
@@ -537,19 +536,29 @@ void shift(inst_t* i,ret_value_t* ret){
 
 void setFlags(int bit,boolean setZero,ret_value_t* ret){
 	int ctr = 0;
-	char * bits [5] ;
+	char * bits [7] ;
 	bits[0]="CF";
 	bits[1]="PF";
 	bits[2]="ZF";
 	bits[3]="SF";
-	bits[4]="OF";
+	bits[4]="IF";
+	bits[5]="DF";
+	bits[6]="OF";
+	char bit_n[2];
+	strncpy(bit_n, bits[bit],2);
 	FILE * f = fopen("flags.txt","w");
 	ret->filename = "flags.txt";
 	//fetch phase
 		fetch(ret,f);
 	//TODO: how to write the correct bit on Flags reg
-	if(setZero);
-	else;
+	if(setZero){
+		fprintf(f,"FLAG_%s_0",bit_n);
+		ctr ++;
+	}
+	else{
+		fprintf(f,"FLAG_%s_1",bit_n);
+		ctr ++;
+	}
 	fclose(f);
 	ret->num_pass += ctr;
 }
