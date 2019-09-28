@@ -9,10 +9,9 @@ void generate_microcode(inst_t* i,ret_value_t* t){
 	if(class == 0){
 		if(type == 0)
 			 hlt(t);
-		else if(type == 1){
+		else if(type == 1)
 			 nope(t);
-		}
-		else if(type == 2);
+		else if(type == 2)
 			 inte(t);
 	}
 	
@@ -150,11 +149,11 @@ void hlt(ret_value_t* ret){
 	char* filename = "hlt.txt";
 	ret->filename=filename;
 	FILE * f = fopen(filename,"w");
+	fetch(ret,f);
 	printf("hlt\n");
-	fprintf(f,"la CPU si mette in modalità risparimo energetico");
+	fprintf(f,"HLT");
 	fclose(f);
-	error_handler("la CPU si mette in modalità risparimo energetico");
-	ret->num_pass = 0;
+	ret->num_pass += 1;
 }
 void nope(ret_value_t* ret){
 	char* filename = "nope.txt";
@@ -165,7 +164,7 @@ void nope(ret_value_t* ret){
 	//fetch phase
 	fetch(ret,f);
 	fclose(f);
-	ret->num_pass = ctr;
+	ret->num_pass += ctr;
 }
 
 void inte(ret_value_t* ret){
@@ -173,10 +172,10 @@ void inte(ret_value_t* ret){
 	ret->filename=filename;
 	FILE * f = fopen(filename,"w");
 	printf("int\n");
-	fprintf(f,"la CPU si mette in ascolto di un interrupt");
+	fetch(ret,f);
+	fprintf(f,"INT");
 	fclose(f);
-	error_handler("la CPU si mette in ascolto di un interrupt");
-	ret->num_pass =0;
+	ret->num_pass +=1;
 }
 
 void mov(operando_t* d, operando_t*s,ret_value_t* ret){
